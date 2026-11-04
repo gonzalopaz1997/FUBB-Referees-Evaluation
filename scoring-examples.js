@@ -23,7 +23,7 @@
       tournament: T(same(8, { ok: 3, bad: 2, tags: { mechanicsPositioning: ['pos', 'neg'], gameManagement: ['pos', 'neg'], useOfSignals: ['pos', 'neg'] } }, { 5: { tags: { mechanicsPositioning: ['neg', 'neg'], gameManagement: ['pos', 'pos'], useOfSignals: ['pos', 'pos'] } } })) },
     { score: 2, id: 'below',
       title: 'Caso B — Cómo un árbitro llega a 2 (Por debajo del estándar)',
-      story: 'Ocho juegos. En Mecánica y posicionamiento el árbitro junta cuatro tags negativos en cada juego. En los juegos 3 y 6 no cobra una falta Antideportiva (ICNC) y en el juego 5 el evaluador registra un Error de reglas con impacto Muy malo. Cada uno es un camino distinto hacia el 2: alcanza con cualquiera.',
+      story: 'Ocho juegos. En Mecánica y posicionamiento el árbitro junta cuatro tags negativos en cada juego. En los juegos 3 y 6 no cobra una falta Flagrante (no cobro incorrecto) y en el juego 5 el evaluador registra un Error de reglas con impacto Muy malo. Cada uno es un camino distinto hacia el 2: alcanza con cualquiera.',
       tournament: T(same(8, { ok: 3, bad: 1, tags: { mechanicsPositioning: ['neg', 'neg', 'neg', 'neg'], gameManagement: ['pos', 'neg'], useOfSignals: ['pos', 'neg'] } },
         { 2: { extra: [P('ICNC', {}, { incident: 'unsportsmanlike' })] }, 5: { extra: [P('ICNC', {}, { incident: 'unsportsmanlike' })] }, 4: { extra: [P('CCM', {}, { rules: { [REF]: 'veryBad' } })] } })) },
     { score: 4, id: 'above',

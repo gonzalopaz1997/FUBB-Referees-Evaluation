@@ -7,32 +7,33 @@
 
   window.plain = l => l.replace('✅ ', 'Correcto ').replace('⛔ ', 'Incorrecto ');
   // Botones que ya no existen pero pueden estar en archivos viejos
-  window.LEGACY_LABELS = { otherFouls: 'Otras faltas', doubleWhistle: 'Cobro cruzado/DW' };
+  window.LEGACY_LABELS = { otherFouls: 'Otras faltas', doubleWhistle: 'Cobro cruzado/DW', reboundFoul: 'Falta en rebote', clearImpactCip: 'Impacto claro (CIP)' };
   window.PANEL_BUTTONS = [
-    mk('callResult', 'Resultado del cobro', [['CCM', 'CCM'], ['ICCM', 'ICCM'], ['ICNC', 'ICNC'], ['CNC', 'CNC']]),
+    mk('callResult', 'Resultado del cobro', [['Cobro correcto', 'CCM'], ['Cobro incorrecto', 'ICCM'], ['No cobro incorrecto', 'ICNC'], ['No cobro correcto', 'CNC']]),
     mk('fouls', 'Faltas', [
       ['Bloqueo / Carga', 'blockCharge'], ['Agarrar / Sujetar', 'holding'], ['Uso ilegal de manos', 'illegalHands'],
-      ['Pantalla ilegal', 'illegalScreen'], ['Falta en tiro', 'shootingFoul'], ['Falta en rebote', 'reboundFoul'],
-      ['Antideportiva', 'unsportsmanlike'], ['Técnica', 'technical'], ['Descalificante', 'disqualifying']
+      ['Pantalla ilegal', 'illegalScreen'], ['Falta en tiro', 'shootingFoul'], ['Disruptiva', 'disruptive'],
+      ['Flagrante', 'unsportsmanlike'], ['Técnica', 'technical'], ['Descalificante', 'disqualifying']
     ], { group: 'incidentType' }),
     mk('violations', 'Violaciones', [
-      ['Pasos', 'travelling'], ['Dobles', 'doubleDribbling'], ['3 seg.', 'threeSeconds'],
+      ['Caminar', 'travelling'], ['Doble regate', 'doubleDribbling'], ['3 seg.', 'threeSeconds'],
       ['5 seg.', 'fiveSeconds'], ['8 seg.', 'eightSeconds'], ['24 seg.', 'shotClock'],
-      ['Campo atrás', 'backcourt'], ['Interposición', 'goaltending'], ['Fuera de banda', 'outOfBounds'],
-      ['Pie', 'kicking']
+      ['Campo atrás', 'backcourt'], ['Interposición', 'goaltending'], ['Interferencia', 'interference'],
+      ['Fuera de banda', 'outOfBounds'], ['Pie', 'kicking']
     ], { group: 'incidentType' }),
     mk('others', 'Otros', [['Demora', 'delay'], ['Conducta', 'behaviour'], ['Control del banco', 'benchControl'], ['Reloj / 24"', 'clockError']], { group: 'incidentType' }),
     mk('review', 'Sistema de revisión', [['✅ Uso IRS', 'correctUseIrs'], ['⛔ Uso IRS', 'incorrectUseIrs'], ['✅ Challenge', 'correctChallenge'], ['⛔ Challenge', 'incorrectChallenge']]),
     mk('tags', 'Tags', [
-      ['Cobro cruzado/DW', 'crossedCallDw'], ['Impacto claro (CIP)', 'clearImpactCip'], ['Llamada fantasma', 'phantomCall'],
+      ['Cobro cruzado/DW', 'crossedCallDw'], ['Llamada fantasma', 'phantomCall'],
       ['Mecánica/Posición', 'mechanicsPositioning'], ['Rotación', 'rotation'], ['IOT', 'iot'],
       ['Comunicación', 'communication'], ['Protocolos', 'protocols'], ['Manejo del partido', 'gameManagement'],
       ['Control de detalles', 'gameDetailsControl'], ['Uso de señales', 'useOfSignals'], ['Trabajo en equipo', 'teamwork'],
       ['Control emocional', 'emotionalControl'], ['Otro', 'other']
     ], { multi: true }),
   ];
-  // Significado de cada resultado del cobro
+  // Resultado del cobro: la key (CCM/ICCM/ICNC/CNC) es la que se guarda; en pantalla se muestra el texto o la abreviatura
   window.CALL_NAMES = { CCM: 'Cobro correcto', CNC: 'No cobro correcto', ICCM: 'Cobro incorrecto', ICNC: 'No cobro incorrecto' };
+  window.CALL_SHORT = { CCM: 'CC', ICCM: 'CI', ICNC: 'NCI', CNC: 'NCC' };
   // Valores obligatorios al marcar un tag (keys usadas por scoring-criteria.js)
   window.TAG_VALUES = [
     { label: '−−', key: 'supNeg' }, { label: '−', key: 'neg' },
@@ -41,7 +42,6 @@
   // Valores permitidos por tag (los que no aparecen acá admiten los 4 valores)
   window.TAG_ALLOWED = {
     crossedCallDw:        ['neg'],
-    clearImpactCip:       ['neg', 'pos'],
     phantomCall:          ['supNeg', 'neg'],
     mechanicsPositioning: ['neg', 'pos'],
     rotation:             ['neg', 'pos'],
@@ -55,5 +55,7 @@
   window.ROLES = { L: ['Líder', 'LÍD'], C: ['Central', 'CEN'], T: ['Seguidor', 'SEG'] };
   // Períodos: duración en segundos
   window.PERIODS = [['1C', 600], ['2C', 600], ['3C', 600], ['4C', 600], ['TE', 300]];
-  window.CRUCIAL = { periods: ['4C', 'TE'], seconds: 120 }; // últimos 2 minutos del 4.º cuarto y de cada tiempo extra
+  // Tiempo crucial (solo por tiempo): los últimos 2:00 del 4.º cuarto y todo el tiempo extra
+  window.CRUCIAL = { last: { '4C': 120 }, whole: ['TE'] };
+  window.isCrucial = p => (window.CRUCIAL.whole.includes(p.q)) || (p.q in window.CRUCIAL.last && p.time <= window.CRUCIAL.last[p.q]);
 })();

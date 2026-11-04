@@ -7,7 +7,7 @@
    play = { referee, role:'L|C|T', q:'1C..TE', call:'CCM|CNC|ICCM|ICNC', cat:'fouls|violations|others', incident:'travelling', crucial, special,
             review:['correctUseIrs'|'incorrectUseIrs'|'correctChallenge'|'incorrectChallenge'],
             rules:{ 'Nombre árbitro':'bad'|'veryBad' },           // error de conocimiento de reglas
-            tags:{ clearImpactCip:'neg', ... } }                   // supNeg|neg|pos|supPos
+            tags:{ mechanicsPositioning:'neg', ... } }                   // supNeg|neg|pos|supPos
 
    MODELO (resumen)
    1. Cada área parte en 3 (At Standard) = promedio.
@@ -55,7 +55,6 @@ window.SCORING_CRITERIA = {
   importantPlayFactor: { correct: 1.2, incorrect: 0.8 },
   maxPoint: 5,
   correctCallMax: 4,      // una llamada correcta (CCM/CNC) nunca vale más que esto, ni siquiera en jugada Special
-  cipPositiveMax: 4,      // CIP con + nunca vale más que esto
   correctCalls: ['CCM', 'CNC'],
   incorrectCalls: ['ICCM', 'ICNC'],
 
@@ -64,7 +63,7 @@ window.SCORING_CRITERIA = {
 
   // Área 1: puntos del call result (según el tag "decisivo" de la jugada)
   callIncidentCategories: ['fouls', 'violations'],
-  callTags: ['crossedCallDw', 'doubleWhistle', 'clearImpactCip', 'phantomCall'],  // 'doubleWhistle' = nombre viejo (backups anteriores)
+  callTags: ['crossedCallDw', 'doubleWhistle', 'phantomCall'],  // 'doubleWhistle' = nombre viejo (backups anteriores)
   callTagPriority: ['supPos', 'supNeg', 'pos', 'neg'],
   callPoints: {
     correct:   { default: 4, pos: 4, supPos: 5, neg: 4, supNeg: 4 },   // ⚠ neg/supNeg en correctas: supuesto
@@ -72,30 +71,28 @@ window.SCORING_CRITERIA = {
   },
 
   // Umbrales de las causas automáticas basadas en call result
-  gameAutoBelow: { cipTag: 'clearImpactCip', incorrectCipMin: 3, incorrectCallsMoreThan: 5 },
+  gameAutoBelow: { incorrectCallsMoreThan: 5 },   // (en 5x5 no se usa el tag CIP)
   // Error de reglas "Bad" + (1 supNeg o 2 neg) en el mismo partido → partido en 2
   rulesError: { badCombo: { supNeg: 1, neg: 2 } },
 
   // Causas automáticas por partido. (La detección está en el motor, por id; acá van los textos y el efecto.)
   // area: área a la que se le atribuye (null = solo afecta partido/overall). fiba: criterio FIBA al que corresponde.
   autoCauses: [
-    { id: 'manyIncorrect',      score: 2, area: 'callSelection', label: 'Más de 5 cobros incorrectos (ICCM / ICNC) en el juego',
+    { id: 'manyIncorrect',      score: 2, area: 'callSelection', label: 'Más de 5 cobros incorrectos o no cobros incorrectos en el juego',
       fiba: 'Errores repetidos (5) de importancia considerable en el juego' },
-    { id: 'incorrectCip',       score: 2, area: 'callSelection', label: '3 o más cobros incorrectos con tag Impacto claro (CIP)',
-      fiba: 'Error(es) sustancial(es) que no afectan el resultado del juego' },
-    { id: 'unsportsmanlikeNonCall', score: 2, area: 'callSelection', label: 'No cobro (ICNC) de una falta Antideportiva',
+    { id: 'unsportsmanlikeNonCall', score: 2, area: 'callSelection', label: 'No cobro incorrecto de una falta Flagrante',
       fiba: 'No sancionar una falta antideportiva' },
     { id: 'irsWrong',           score: 2, area: null, label: 'Uso incorrecto del IRS (✗ Uso IRS), o uso correcto del IRS con una decisión final equivocada',
       fiba: 'Uso no autorizado del IRS, o uso autorizado con la decisión equivocada' },
-    { id: 'phantomCrucial',     score: 2, area: 'callSelection', label: 'Cobro incorrecto con tag Llamada fantasma en tiempo crucial (últimos 2 minutos del 4.º cuarto o del tiempo extra)',
+    { id: 'phantomCrucial',     score: 2, area: 'callSelection', label: 'Cobro incorrecto con tag Llamada fantasma en tiempo crucial (últimos 2:00 del 4.º cuarto o tiempo extra)',
       fiba: 'Últimos minutos – llamada fantasma clara' },
     { id: 'rulesVeryBad',       score: 2, area: null, label: 'Error de reglas con impacto Muy malo para el árbitro',
       fiba: 'Errores de reglas' },
     { id: 'rulesBadCombo',      score: 2, area: null, label: 'Error de reglas con impacto Malo + un tag muy negativo o dos tags negativos en el mismo juego',
       fiba: 'Errores de reglas' },
-    { id: 'unsportsmanlikeNonCallCrucial', score: 1, area: 'callSelection', label: 'No cobro (ICNC) de una falta Antideportiva en tiempo crucial',
+    { id: 'unsportsmanlikeNonCallCrucial', score: 1, area: 'callSelection', label: 'No cobro incorrecto de una falta Flagrante en tiempo crucial',
       fiba: 'Últimos minutos – no sancionar una falta antideportiva evidente' },
-    { id: 'disqualifyingNonCall', score: 1, area: 'callSelection', label: 'No cobro (ICNC) de una falta Descalificante',
+    { id: 'disqualifyingNonCall', score: 1, area: 'callSelection', label: 'No cobro incorrecto de una falta Descalificante',
       fiba: 'No sancionar violencia o una falta descalificante evidente' }
   ],
 
@@ -136,7 +133,7 @@ window.SCORING_CRITERIA = {
     const x = cap((tbl[v] ?? tbl.default) * factor(p));
     return isOk(p.call) ? Math.min(C.correctCallMax, x) : x;
   }
-  const tagPts = (p, v, k) => { const x = cap(C.tagPoints[v] * factor(p)); return k === C.gameAutoBelow.cipTag && v === 'pos' ? Math.min(C.cipPositiveMax, x) : x; };
+  const tagPts = (p, v) => cap(C.tagPoints[v] * factor(p));
 
   // Causas automáticas de un partido para un árbitro. plays = jugadas del árbitro; rules = impactos de error de reglas
   // rulesList = [{ p: jugada, impact: 'bad'|'veryBad' }] (jugadas del partido con error de reglas para este árbitro)
@@ -145,9 +142,7 @@ window.SCORING_CRITERIA = {
     const out = [], add = (id, ps) => out.push({ ...meta(id), count: 1, plays: ps });
     const g = C.gameAutoBelow, bad = plays.filter(p => isCallPlay(p) && !isOk(p.call));
     const impacts = rulesList.map(r => r.impact), at = f => plays.filter(f);
-    const cipBad = bad.filter(p => (p.tags || {})[g.cipTag]);
     if (bad.length > g.incorrectCallsMoreThan) add('manyIncorrect', bad);
-    if (cipBad.length >= g.incorrectCipMin) add('incorrectCip', cipBad);
     const unsp = at(p => p.incident === 'unsportsmanlike' && p.call === 'ICNC');
     if (unsp.length) add('unsportsmanlikeNonCall', unsp);
     if (unsp.some(p => p.crucial)) add('unsportsmanlikeNonCallCrucial', unsp.filter(p => p.crucial));

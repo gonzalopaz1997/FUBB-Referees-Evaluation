@@ -1,4 +1,4 @@
-const APP_VERSION=1;   // sumar 1 en cada versión entregada (también en sw.js)
+const APP_VERSION=2;   // sumar 1 en cada versión entregada (también en sw.js)
 /* Hay dos conjuntos de datos en el navegador:
    - "Mi evaluación": el juego que evalúa el evaluador (un juego por evaluación).
    - "Consolidado": lo que carga el departamento arbitral uniendo los .txt de muchos evaluadores.
@@ -9,7 +9,7 @@ setMode(m){try{localStorage.setItem(this.KM,m)}catch(e){}},
 get K(){return this.mode=='cons'?this.KC:this.KE},
 // Un juego abierto sin jugadas no se guarda ni se exporta
 clean(t){if(t&&t.games){t.games=t.games.filter(g=>g.closed||(g.plays&&g.plays.length)||(!t.consolidated&&t.games.length==1));t.games.forEach((g,i)=>g.n=i+1)}return t},
-fix(t){if(t)(t.games||[]).forEach(g=>(g.plays||[]).forEach(p=>{if(p.call&&LEGACY_CALLS[p.call])p.call=LEGACY_CALLS[p.call];if(p.tags&&p.tags.doubleWhistle){p.tags.crossedCallDw='neg';delete p.tags.doubleWhistle}if(!p.rules)p.rules={}}));return t},
+fix(t){if(t)(t.games||[]).forEach(g=>(g.plays||[]).forEach(p=>{if(p.call&&LEGACY_CALLS[p.call])p.call=LEGACY_CALLS[p.call];if(p.tags&&p.tags.doubleWhistle){p.tags.crossedCallDw='neg';delete p.tags.doubleWhistle}if(p.tags&&p.tags.clearImpactCip)delete p.tags.clearImpactCip;if(p.incident=='reboundFoul')p.incident='disruptive';if(p.q)p.crucial=isCrucial(p);if(!p.rules)p.rules={}}));return t},
 get(){try{const t=JSON.parse(localStorage.getItem(this.K));if(t){this.clean(t);this.fix(t)}return t}catch(e){return null}},
 set(t){try{localStorage.setItem(this.K,JSON.stringify(t))}catch(e){alert('El navegador no tiene más espacio para guardar los datos. Descargá un respaldo y borrá juegos que ya no necesites.');throw e}},
 clear(){try{localStorage.removeItem(this.K)}catch(e){}},
@@ -46,6 +46,8 @@ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 const roleName=r=>(ROLES[r]||[r])[0],roleAb=r=>(ROLES[r]||[r,r])[1];
 const okCall=c=>c=='CCM'||c=='CNC',allPlays=t=>t.games.flatMap(g=>g.plays);
+const callKey=c=>LEGACY_CALLS_K[c]||c,callLbl=c=>CALL_NAMES[callKey(c)]||c||'–',callAb=c=>CALL_SHORT[callKey(c)]||c||'–';
+const LEGACY_CALLS_K={CC:'CCM',IC:'ICCM',INC:'ICNC'};
 const LEGACY_CALLS={CC:'CCM',IC:'ICCM',INC:'ICNC'};   // nombres anteriores del resultado del cobro (archivos viejos)
 const lbl0=k=>{for(const c of PANEL_BUTTONS){const b=c.buttons.find(b=>b.key==k);if(b)return b.label}return (window.LEGACY_LABELS||{})[k]||k};
 const lbl=k=>{const l=lbl0(k);return k=='other'?'Otro':l},nm=k=>plain(lbl(k));
@@ -62,7 +64,7 @@ dl:svg('<path d="M12 4v11M7 11l5 5 5-5M4 20h16"/>'),ul:svg('<path d="M12 16V5M7 
 up:svg(TH),down:svg(`<g transform="translate(0 24) scale(1 -1)">${TH}</g>`),
 up2:svg(`<g transform="translate(0 6) scale(.62)">${TH}</g><g transform="translate(11 6) scale(.62)">${TH}</g>`),
 down2:svg(`<g transform="translate(0 18) scale(.62 -.62)">${TH}</g><g transform="translate(11 18) scale(.62 -.62)">${TH}</g>`)};
-const COURT='<svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="none" stroke="#7d7a68" stroke-width="1.3"><rect x="33.7" y="0" width="32.6" height="41.4"/><path d="M6 0V21.4A45 48.2 0 0 0 94 21.4V0"/><path d="M38 41.4A12 12.9 0 0 0 62 41.4"/><path d="M38 41.4A12 12.9 0 0 1 62 41.4" stroke-dasharray="3 3"/><path d="M41.7 11.25A8.3 8.9 0 0 0 58.3 11.25"/><path d="M38 100A12 12.9 0 0 1 62 100"/><path d="M44 8.6H56" stroke="#a39665"/><ellipse cx="50" cy="11.25" rx="1.6" ry="1.7" stroke="#a39665"/></g></svg>';
+const COURT='<svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="none" stroke="#7d7a68" stroke-width="1.3"><rect x="33.7" y="0" width="32.6" height="34.8"/><path d="M6 0V10A44 40.5 0 0 0 94 10V0"/><path d="M38 34.8A12 10.8 0 0 0 62 34.8"/><path d="M38 34.8A12 10.8 0 0 1 62 34.8" stroke-dasharray="3 3"/><path d="M41.7 9.45A8.3 7.5 0 0 0 58.3 9.45"/><path d="M38 100A12 12.9 0 0 1 62 100"/><path d="M44 7.2H56" stroke="#a39665"/><ellipse cx="50" cy="9.45" rx="1.6" ry="1.5" stroke="#a39665"/></g></svg>';
 // Encabezado: logo, título, accesos y a la derecha el evento + evaluador + versión
 const hdrInfo=T=>!T?'':T.consolidated?`<b>Consolidado</b> · ${T.games.length} juegos`:`${esc(T.name||'')}${T.evaluator?`<br>Evaluador: <b>${esc(T.evaluator)}</b>`:''}`;
 const hdr=(t,ev,nav=1)=>`<header class="hd"><a class="lg" href="index.html"><img src="logo.png" alt="FUBB"></a><span class="ti">${t}</span>${nav?`<a class="ib" href="statistics-view.html" title="Estadísticas">${IC.stats}</a><a class="ib" href="index.html" title="Inicio">${IC.home}</a>`:''}<div class="ev">${(ev||'').replace(/^<br>/,'')}<span class="vr">Versión ${APP_VERSION}</span></div></header>`;
