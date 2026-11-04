@@ -3,19 +3,17 @@
    scoring-criteria.js: si cambiás el texto, dejá la misma key. Para agregar un botón, sumá una fila
    con una key nueva (sin tildes ni espacios, en camelCase). */
 (function () {
-  const mk = (id, title, items, extra) => ({
-    id, title, ...extra,
-    buttons: items.map(([label, key]) => ({ label, key }))
-  });
+  const mk = (id, title, items, extra) => ({ id, title, ...extra, buttons: items.map(([label, key]) => ({ label, key })) });
 
   window.plain = l => l.replace('✅ ', 'Correcto ').replace('⛔ ', 'Incorrecto ');
+  // Botones que ya no existen pero pueden estar en archivos viejos
+  window.LEGACY_LABELS = { otherFouls: 'Otras faltas', doubleWhistle: 'Cobro cruzado/DW' };
   window.PANEL_BUTTONS = [
-    mk('callResult', 'Resultado del cobro', [['CC', 'CC'], ['IC', 'IC'], ['INC', 'INC'], ['CNC', 'CNC']]),
+    mk('callResult', 'Resultado del cobro', [['CCM', 'CCM'], ['ICCM', 'ICCM'], ['ICNC', 'ICNC'], ['CNC', 'CNC']]),
     mk('fouls', 'Faltas', [
       ['Bloqueo / Carga', 'blockCharge'], ['Agarrar / Sujetar', 'holding'], ['Uso ilegal de manos', 'illegalHands'],
       ['Pantalla ilegal', 'illegalScreen'], ['Falta en tiro', 'shootingFoul'], ['Falta en rebote', 'reboundFoul'],
-      ['Antideportiva', 'unsportsmanlike'], ['Técnica', 'technical'], ['Descalificante', 'disqualifying'],
-      ['Otras faltas', 'otherFouls']
+      ['Antideportiva', 'unsportsmanlike'], ['Técnica', 'technical'], ['Descalificante', 'disqualifying']
     ], { group: 'incidentType' }),
     mk('violations', 'Violaciones', [
       ['Pasos', 'travelling'], ['Dobles', 'doubleDribbling'], ['3 seg.', 'threeSeconds'],
@@ -33,6 +31,8 @@
       ['Control emocional', 'emotionalControl'], ['Otro', 'other']
     ], { multi: true }),
   ];
+  // Significado de cada resultado del cobro
+  window.CALL_NAMES = { CCM: 'Cobro correcto', CNC: 'No cobro correcto', ICCM: 'Cobro incorrecto', ICNC: 'No cobro incorrecto' };
   // Valores obligatorios al marcar un tag (keys usadas por scoring-criteria.js)
   window.TAG_VALUES = [
     { label: '−−', key: 'supNeg' }, { label: '−', key: 'neg' },
@@ -55,5 +55,5 @@
   window.ROLES = { L: ['Líder', 'LÍD'], C: ['Central', 'CEN'], T: ['Seguidor', 'SEG'] };
   // Períodos: duración en segundos
   window.PERIODS = [['1C', 600], ['2C', 600], ['3C', 600], ['4C', 600], ['TE', 300]];
-  window.CRUCIAL = { periods: ['4C', 'TE'], seconds: 120 }; // últimos 2 minutos del 4.º cuarto y del tiempo extra
+  window.CRUCIAL = { periods: ['4C', 'TE'], seconds: 120 }; // últimos 2 minutos del 4.º cuarto y de cada tiempo extra
 })();
