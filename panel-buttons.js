@@ -7,9 +7,9 @@
 
   window.plain = l => l.replace('✅ ', 'Correcto ').replace('⛔ ', 'Incorrecto ');
   // Botones que ya no existen pero pueden estar en archivos viejos
-  window.LEGACY_LABELS = { otherFouls: 'Otras faltas', doubleWhistle: 'Cobro cruzado/DW', reboundFoul: 'Falta en rebote', clearImpactCip: 'Impacto claro (CIP)' };
+  window.LEGACY_LABELS = { otherFouls: 'Otras faltas', doubleWhistle: 'Cobro cruzado/DW', reboundFoul: 'Falta en rebote', clearImpactCip: 'Impacto claro (CIP)', clockError: 'Reloj / 24"' };
   window.PANEL_BUTTONS = [
-    mk('callResult', 'Resultado del cobro', [['Cobro correcto', 'CCM'], ['Cobro incorrecto', 'ICCM'], ['No cobro incorrecto', 'ICNC'], ['No cobro correcto', 'CNC']]),
+    mk('callResult', 'Resultado del cobro', [['COBRO CORRECTO', 'CCM'], ['COBRO INCORRECTO', 'ICCM'], ['NO COBRO INCORRECTO', 'ICNC'], ['NO COBRO CORRECTO', 'CNC']]),
     mk('fouls', 'Faltas', [
       ['Bloqueo / Carga', 'blockCharge'], ['Agarrar / Sujetar', 'holding'], ['Uso ilegal de manos', 'illegalHands'],
       ['Pantalla ilegal', 'illegalScreen'], ['Falta en tiro', 'shootingFoul'], ['Disruptiva', 'disruptive'],
@@ -21,18 +21,18 @@
       ['Campo atrás', 'backcourt'], ['Interposición', 'goaltending'], ['Interferencia', 'interference'],
       ['Fuera de banda', 'outOfBounds'], ['Pie', 'kicking']
     ], { group: 'incidentType' }),
-    mk('others', 'Otros', [['Demora', 'delay'], ['Conducta', 'behaviour'], ['Control del banco', 'benchControl'], ['Reloj / 24"', 'clockError']], { group: 'incidentType' }),
+    mk('others', 'Otros', [['Demora', 'delay'], ['Conducta', 'behaviour'], ['Control del banco', 'benchControl'], ['Saque rápido', 'quickInbound']], { group: 'incidentType' }),
     mk('review', 'Sistema de revisión', [['✅ Uso IRS', 'correctUseIrs'], ['⛔ Uso IRS', 'incorrectUseIrs'], ['✅ Challenge', 'correctChallenge'], ['⛔ Challenge', 'incorrectChallenge']]),
     mk('tags', 'Tags', [
       ['Cobro cruzado/DW', 'crossedCallDw'], ['Llamada fantasma', 'phantomCall'],
-      ['Mecánica/Posición', 'mechanicsPositioning'], ['Rotación', 'rotation'], ['IOT', 'iot'],
+      ['Posicionamiento', 'mechanicsPositioning'], ['Rotación', 'rotation'], ['IOT', 'iot'],
       ['Comunicación', 'communication'], ['Protocolos', 'protocols'], ['Manejo del partido', 'gameManagement'],
       ['Control de detalles', 'gameDetailsControl'], ['Uso de señales', 'useOfSignals'], ['Trabajo en equipo', 'teamwork'],
       ['Control emocional', 'emotionalControl'], ['Otro', 'other']
     ], { multi: true }),
   ];
   // Resultado del cobro: la key (CCM/ICCM/ICNC/CNC) es la que se guarda; en pantalla se muestra el texto o la abreviatura
-  window.CALL_NAMES = { CCM: 'Cobro correcto', CNC: 'No cobro correcto', ICCM: 'Cobro incorrecto', ICNC: 'No cobro incorrecto' };
+  window.CALL_NAMES = { CCM: 'COBRO CORRECTO', CNC: 'NO COBRO CORRECTO', ICCM: 'COBRO INCORRECTO', ICNC: 'NO COBRO INCORRECTO' };
   window.CALL_SHORT = { CCM: 'CC', ICCM: 'CI', ICNC: 'NCI', CNC: 'NCC' };
   // Valores obligatorios al marcar un tag (keys usadas por scoring-criteria.js)
   window.TAG_VALUES = [

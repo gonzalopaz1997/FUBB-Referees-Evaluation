@@ -1,4 +1,4 @@
-const APP_VERSION=2;   // sumar 1 en cada versión entregada (también en sw.js)
+const APP_VERSION=4;   // sumar 1 en cada versión entregada (también en sw.js)
 /* Hay dos conjuntos de datos en el navegador:
    - "Mi evaluación": el juego que evalúa el evaluador (un juego por evaluación).
    - "Consolidado": lo que carga el departamento arbitral uniendo los .txt de muchos evaluadores.
@@ -64,7 +64,7 @@ dl:svg('<path d="M12 4v11M7 11l5 5 5-5M4 20h16"/>'),ul:svg('<path d="M12 16V5M7 
 up:svg(TH),down:svg(`<g transform="translate(0 24) scale(1 -1)">${TH}</g>`),
 up2:svg(`<g transform="translate(0 6) scale(.62)">${TH}</g><g transform="translate(11 6) scale(.62)">${TH}</g>`),
 down2:svg(`<g transform="translate(0 18) scale(.62 -.62)">${TH}</g><g transform="translate(11 18) scale(.62 -.62)">${TH}</g>`)};
-const COURT='<svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="none" stroke="#7d7a68" stroke-width="1.3"><rect x="33.7" y="0" width="32.6" height="34.8"/><path d="M6 0V10A44 40.5 0 0 0 94 10V0"/><path d="M38 34.8A12 10.8 0 0 0 62 34.8"/><path d="M38 34.8A12 10.8 0 0 1 62 34.8" stroke-dasharray="3 3"/><path d="M41.7 9.45A8.3 7.5 0 0 0 58.3 9.45"/><path d="M38 100A12 12.9 0 0 1 62 100"/><path d="M44 7.2H56" stroke="#a39665"/><ellipse cx="50" cy="9.45" rx="1.6" ry="1.5" stroke="#a39665"/></g></svg>';
+const COURT='<svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="none" stroke="#7d7a68" stroke-width="1.3"><rect x="33.7" y="0" width="32.6" height="50"/><path d="M8 0V28A42 47 0 0 0 92 28V0"/><path d="M38 50A12 15 0 0 0 62 50"/><path d="M38 50A12 15 0 0 1 62 50" stroke-dasharray="3 3"/><path d="M41.7 10.5A8.3 10 0 0 0 58.3 10.5"/><path d="M38 100A12 15 0 0 1 62 100"/><path d="M44 7.5H56" stroke="#a39665"/><ellipse cx="50" cy="10.5" rx="1.6" ry="1.8" stroke="#a39665"/></g></svg>';
 // Encabezado: logo, título, accesos y a la derecha el evento + evaluador + versión
 const hdrInfo=T=>!T?'':T.consolidated?`<b>Consolidado</b> · ${T.games.length} juegos`:`${esc(T.name||'')}${T.evaluator?`<br>Evaluador: <b>${esc(T.evaluator)}</b>`:''}`;
 const hdr=(t,ev,nav=1)=>`<header class="hd"><a class="lg" href="index.html"><img src="logo.png" alt="FUBB"></a><span class="ti">${t}</span>${nav?`<a class="ib" href="statistics-view.html" title="Estadísticas">${IC.stats}</a><a class="ib" href="index.html" title="Inicio">${IC.home}</a>`:''}<div class="ev">${(ev||'').replace(/^<br>/,'')}<span class="vr">Versión ${APP_VERSION}</span></div></header>`;

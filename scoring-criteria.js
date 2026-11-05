@@ -78,21 +78,21 @@ window.SCORING_CRITERIA = {
   // Causas automáticas por partido. (La detección está en el motor, por id; acá van los textos y el efecto.)
   // area: área a la que se le atribuye (null = solo afecta partido/overall). fiba: criterio FIBA al que corresponde.
   autoCauses: [
-    { id: 'manyIncorrect',      score: 2, area: 'callSelection', label: 'Más de 5 cobros incorrectos o no cobros incorrectos en el juego',
+    { id: 'manyIncorrect',      score: 2, area: 'callSelection', label: 'Más de 5 COBROS INCORRECTOS o NO COBROS INCORRECTOS en el juego',
       fiba: 'Errores repetidos (5) de importancia considerable en el juego' },
-    { id: 'unsportsmanlikeNonCall', score: 2, area: 'callSelection', label: 'No cobro incorrecto de una falta Flagrante',
+    { id: 'unsportsmanlikeNonCall', score: 2, area: 'callSelection', label: 'NO COBRO INCORRECTO de una falta Flagrante',
       fiba: 'No sancionar una falta antideportiva' },
     { id: 'irsWrong',           score: 2, area: null, label: 'Uso incorrecto del IRS (✗ Uso IRS), o uso correcto del IRS con una decisión final equivocada',
       fiba: 'Uso no autorizado del IRS, o uso autorizado con la decisión equivocada' },
-    { id: 'phantomCrucial',     score: 2, area: 'callSelection', label: 'Cobro incorrecto con tag Llamada fantasma en tiempo crucial (últimos 2:00 del 4.º cuarto o tiempo extra)',
+    { id: 'phantomCrucial',     score: 2, area: 'callSelection', label: 'COBRO INCORRECTO con tag Llamada fantasma en tiempo crucial (últimos 2:00 del 4.º cuarto o tiempo extra)',
       fiba: 'Últimos minutos – llamada fantasma clara' },
     { id: 'rulesVeryBad',       score: 2, area: null, label: 'Error de reglas con impacto Muy malo para el árbitro',
       fiba: 'Errores de reglas' },
     { id: 'rulesBadCombo',      score: 2, area: null, label: 'Error de reglas con impacto Malo + un tag muy negativo o dos tags negativos en el mismo juego',
       fiba: 'Errores de reglas' },
-    { id: 'unsportsmanlikeNonCallCrucial', score: 1, area: 'callSelection', label: 'No cobro incorrecto de una falta Flagrante en tiempo crucial',
+    { id: 'unsportsmanlikeNonCallCrucial', score: 1, area: 'callSelection', label: 'NO COBRO INCORRECTO de una falta Flagrante en tiempo crucial',
       fiba: 'Últimos minutos – no sancionar una falta antideportiva evidente' },
-    { id: 'disqualifyingNonCall', score: 1, area: 'callSelection', label: 'No cobro incorrecto de una falta Descalificante',
+    { id: 'disqualifyingNonCall', score: 1, area: 'callSelection', label: 'NO COBRO INCORRECTO de una falta Descalificante',
       fiba: 'No sancionar violencia o una falta descalificante evidente' }
   ],
 
