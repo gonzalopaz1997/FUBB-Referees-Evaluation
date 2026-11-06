@@ -1,4 +1,4 @@
-const APP_VERSION=7;   // sumar 1 en cada versión entregada (también en sw.js)
+const APP_VERSION=8;   // sumar 1 en cada versión entregada (también en sw.js)
 /* Hay dos conjuntos de datos en el navegador:
    - "Mi evaluación": el juego que evalúa el evaluador (un juego por evaluación).
    - "Consolidado": lo que carga el departamento arbitral uniendo los .txt de muchos evaluadores.
@@ -77,5 +77,8 @@ down2:svg(`<g transform="translate(0 18) scale(.62 -.62)">${TH}</g><g transform=
 const COURT='<svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="none" stroke="#7d7a68" stroke-width="1.3"><rect x="33.7" y="0" width="32.6" height="50"/><path d="M8 0V28A42 47 0 0 0 92 28V0"/><path d="M38 50A12 15 0 0 0 62 50"/><path d="M38 50A12 15 0 0 1 62 50" stroke-dasharray="3 3"/><path d="M41.7 10.5A8.3 10 0 0 0 58.3 10.5"/><path d="M38 100A12 15 0 0 1 62 100"/><path d="M44 7.5H56" stroke="#a39665"/><ellipse cx="50" cy="10.5" rx="1.6" ry="1.8" stroke="#a39665"/></g></svg>';
 // Encabezado: logo, título, accesos y a la derecha el evento + evaluador + versión
 const hdrInfo=T=>!T?'':T.consolidated?`<b>Consolidado</b> · ${T.games.length} ${T.games.length===1?'juego':'juegos'}`:`${esc(T.name||'')}${T.evaluator?`<br>Evaluador: <b>${esc(T.evaluator)}</b>`:''}`;
-const hdr=(t,ev,nav=1)=>`<header class="hd"><a class="lg" href="index.html"><img src="logo.png" alt="FUBB"></a><span class="ti">${t}</span>${nav?`<a class="ib" href="statistics-view.html" title="Estadísticas">${IC.stats}</a><a class="ib" href="index.html" title="Inicio">${IC.home}</a>`:''}<div class="ev">${(ev||'').replace(/^<br>/,'')}<a class="vr" href="versions.html" title="Historial de versiones">Versión ${APP_VERSION}</a></div></header>`;
+/* Aviso de datos ficticios: se muestra en todas las pantallas mientras los datos cargados sean los de ejemplo */
+const isDemo=()=>{try{const t=Store.get();return !!(t&&t.example)}catch(e){return false}};
+const DEMO_NOTE='<p style="border:2px solid #c99a00;color:#8a6500;font-weight:800;padding:6px 10px;text-transform:uppercase;letter-spacing:.06em">Datos de demostración · No reales — informe generado con datos ficticios de ejemplo</p>';
+const hdr=(t,ev,nav=1)=>`<header class="hd"><a class="lg" href="index.html"><img src="logo.png" alt="FUBB"></a><span class="ti">${t}</span>${isDemo()?`<span class="demo" title="Estos datos son ficticios: sirven solo para mostrar cómo funciona la herramienta">Datos de demostración · No reales</span>`:''}${nav?`<a class="ib" href="statistics-view.html" title="Estadísticas">${IC.stats}</a><a class="ib" href="index.html" title="Inicio">${IC.home}</a>`:''}<div class="ev">${(ev||'').replace(/^<br>/,'')}<a class="vr" href="versions.html" title="Historial de versiones">Versión ${APP_VERSION}</a></div></header>`;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

@@ -18,3 +18,7 @@ button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;ba
 .rp-hint{color:#8a877b;font-size:.9em;padding:6px 2px}.rp-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b)}.rp-nm{flex:1;min-width:0}.rp-cat{background:#0b0b0b;border:1px solid var(--b);border-radius:8px;padding:8px;width:7.5em}.rp-cat.rp-need{border-color:var(--o);box-shadow:0 0 0 1px rgba(163,150,101,.5)}
 .rp-row button{display:flex;padding:8px}.rp-row button:disabled{opacity:.25;cursor:not-allowed}.rp-add{margin-top:10px;border:1px dashed var(--b);border-radius:8px;padding:8px 10px}.rp-add summary{cursor:pointer;color:var(--o2);display:flex;align-items:center;gap:8px}
 .rp-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.rp-form .inp{flex:1 1 9em;width:auto}.rp-err{color:#e09a93;font-size:.9em;margin-top:6px;min-height:1em}.rp-imp{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.85em;color:#9a978c;cursor:pointer}
+
+.hd .ti:has(+.demo){flex:0 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .demo{flex:none;margin-right:auto;border:2px solid #ffd23f;color:#ffd23f;background:transparent;border-radius:6px;padding:.25em .7em;font-size:.78em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;text-shadow:0 0 8px rgba(255,210,63,.75);box-shadow:0 0 10px rgba(255,210,63,.35),inset 0 0 6px rgba(255,210,63,.2)}
+@media(max-width:700px){.hd .demo{font-size:.6em;padding:.2em .4em;letter-spacing:.03em}}
