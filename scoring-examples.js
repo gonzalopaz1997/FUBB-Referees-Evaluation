@@ -1,40 +1,31 @@
-/* scoring-examples.js — casos hipotéticos de la página "Reglas de puntaje" (FUBB 5x5).
-   Se evalúan con el MISMO motor (assessReferee) que la herramienta, así los números nunca quedan desactualizados. */
+/* scoring-examples.js — partidos hipotéticos para la página "Reglas de puntaje".
+   Los puntajes NO están escritos acá: los calcula el motor (scoring-criteria.js) cada vez que se abre la página. */
 (function () {
-  const REF = 'Árbitro';
-  const P = (call, tags, o) => ({ referee: REF, call, cat: 'fouls', incident: 'blockCharge', role: 'L', q: '2C', time: 300, tags: tags || {}, crucial: false, special: false, review: [], rules: {}, ...(o || {}) });
-  // s = { ok, okCip, bad, tags:{tagKey:[valores]}, special, extra:[jugadas] }
-  function game(i, s) {
-    const plays = [];
-    for (let k = 0; k < (s.ok || 0); k++) plays.push(P('CCM'));
-    for (let k = 0; k < (s.okSpecial || 0); k++) plays.push(P('CCM', {}, { special: true }));
-    for (let k = 0; k < (s.bad || 0); k++) plays.push(P('ICCM'));
-    Object.entries(s.tags || {}).forEach(([t, vals]) => vals.forEach(v => plays.push(P('CCM', { [t]: v }, { special: !!s.special }))));
-    (s.extra || []).forEach(p => plays.push(p));
-    return { id: i + 1, n: i + 1, difficulty: s.difficulty, date: '', teamA: 'Equipo ' + String.fromCharCode(65 + i), teamB: 'Equipo ' + String.fromCharCode(73 + i), plays };
-  }
-  const T = games => ({ games: games.map((s, i) => game(i, s)) });
-  const same = (n, s, over) => Array.from({ length: n }, (_, i) => ({ ...s, ...(over && over[i] || {}) }));
+  const REF = 'Árbitro', OTRO = 'Compañero';
+  let id = 0;
+  const P = (call, o = {}) => ({ id: ++id, n: id, refs: [{ name: REF, role: o.role || 'L' }], call, cat: o.cat || 'fouls', incident: o.incident || 'blockCharge',
+    q: o.q || '2C', time: o.time ?? 300, crucial: !!o.crucial, special: !!o.special, tags: o.tags || {}, reviews: o.reviews || [], rules: o.rules || {}, zone: 6 });
+  const rep = (k, f) => Array.from({ length: k }, f);
+  const game = (difficulty, plays) => ({ games: [{ id: 1, n: 1, difficulty, date: '', teamA: 'Local', teamB: 'Visitante', plays }] });
 
-  window.SCORING_EXAMPLES = [
-    { score: 3, id: 'standard',
-      title: 'Caso A — Una temporada sólida y común → 3 (En el estándar)',
-      story: 'Ocho juegos. El árbitro acierta la mayoría de los cobros, con un par de errores por juego, y junta una mezcla de tags positivos y negativos. Nada se destaca y ninguna regla se activa: es el árbitro promedio.',
-      tournament: T(same(8, { ok: 3, bad: 2, tags: { mechanicsPositioning: ['pos', 'neg'], gameManagement: ['pos', 'neg'], useOfSignals: ['pos', 'neg'] } }, { 5: { tags: { mechanicsPositioning: ['neg', 'neg'], gameManagement: ['pos', 'pos'], useOfSignals: ['pos', 'pos'] } } })) },
-    { score: 2, id: 'below',
-      title: 'Caso B — Cómo un árbitro llega a 2 (Por debajo del estándar)',
-      story: 'Ocho juegos. En Mecánica y posicionamiento el árbitro junta cuatro tags negativos en cada juego. En los juegos 3 y 6 no cobra una falta Flagrante (no cobro incorrecto) y en el juego 5 el evaluador registra un Error de reglas con impacto Muy malo. Cada uno es un camino distinto hacia el 2: alcanza con cualquiera.',
-      tournament: T(same(8, { ok: 3, bad: 1, tags: { mechanicsPositioning: ['neg', 'neg', 'neg', 'neg'], gameManagement: ['pos', 'neg'], useOfSignals: ['pos', 'neg'] } },
-        { 2: { extra: [P('ICNC', {}, { incident: 'unsportsmanlike' })] }, 5: { extra: [P('ICNC', {}, { incident: 'unsportsmanlike' })] }, 4: { extra: [P('CCM', {}, { rules: { [REF]: 'veryBad' } })] } })) },
-    { score: 4, id: 'above',
-      title: 'Caso C — Cómo un árbitro llega a 4 (Por encima del estándar)',
-      story: 'Ocho juegos. El árbitro acierta casi siempre y en cuatro áreas los tags son positivos juego tras juego. Un juego tiene un tag negativo y un cobro incorrecto, lo que es normal. Trabajo en equipo / Control emocional nunca recibe tags.',
-      tournament: T(same(8, { ok: 3, tags: { mechanicsPositioning: ['pos', 'pos'], rotation: ['pos'], gameManagement: ['pos', 'pos'], useOfSignals: ['pos', 'pos'] } },
-        { 3: { bad: 1, tags: { mechanicsPositioning: ['pos', 'pos', 'neg'], gameManagement: ['pos', 'pos'], useOfSignals: ['pos', 'pos'] } } })) },
-    { score: 5, id: 'superior',
-      title: 'Caso D — Cómo un árbitro llega a 5 (Rendimiento superior)',
-      story: 'Ocho juegos. En cada juego el árbitro acierta las jugadas más importantes (jugadas especiales), acierta los cobros clave y se destaca en las cinco áreas. Un 5 es excepcional: necesita este nivel en todas las áreas y en al menos la mitad de los juegos.',
-      tournament: T(same(8, { okSpecial: 3, special: true, tags: { mechanicsPositioning: ['pos', 'pos'], gameManagement: ['supPos', 'supPos'], useOfSignals: ['pos', 'pos'], teamwork: ['supPos', 'pos'] } })) }
-  ];
   window.SCORING_EXAMPLE_REF = REF;
+  window.SCORING_EXAMPLES = [
+    { title: 'Caso A — Un partido común', difficulty: 'normal',
+      story: '20 decisiones registradas: 17 correctas y 3 incorrectas. Algunos tags positivos y negativos repartidos. Ninguna causa automática.',
+      t: game('normal', [...rep(17, () => P('CCM')), ...rep(3, () => P('ICCM')),
+        P('CCM', { tags: { mechanicsPositioning: 'neg' } }), P('CCM', { tags: { mechanicsPositioning: 'pos' } }), P('CCM', { tags: { communication: 'pos' } }), P('CCM', { tags: { gameManagement: 'neg' } })]) },
+    { title: 'Caso B — Buen trabajo en un partido difícil', difficulty: 'hard',
+      story: 'Partido Difícil. 18 decisiones: 17 correctas y 1 incorrecta; una jugada especial bien resuelta. Tags positivos en mecánica, manejo y señales.',
+      t: game('hard', [...rep(16, () => P('CCM')), P('ICCM'), P('CCM', { special: true, crucial: true, q: '4C', time: 40 }),
+        P('CCM', { tags: { mechanicsPositioning: 'pos', rotation: 'pos' } }), P('CCM', { tags: { gameManagement: 'supPos' } }), P('CCM', { tags: { useOfSignals: 'pos', communication: 'pos' } }), P('CCM', { tags: { teamwork: 'pos' } })]) },
+    { title: 'Caso C — Decisiones correctas pero muchos tags negativos', difficulty: 'normal',
+      story: 'Todas las decisiones son correctas, pero el árbitro recibe 6 tags negativos de posicionamiento. Los tags bajan el área a 2,00, pero no son causa automática: el partido no queda limitado a 2,79.',
+      t: game('normal', [...rep(14, () => P('CCM')), ...rep(6, () => P('CCM', { tags: { mechanicsPositioning: 'neg' } }))]) },
+    { title: 'Caso D — 10 decisiones incorrectas', difficulty: 'normal',
+      story: '30 decisiones: 20 correctas y 10 incorrectas. Al llegar a 10 incorrectas se activa la causa automática y el global queda limitado a 2,79 aunque el promedio dé más.',
+      t: game('normal', [...rep(20, () => P('CCM')), ...rep(10, () => P(['ICCM', 'ICNC'][id % 2])), P('CCM', { tags: { communication: 'pos' } })]) },
+    { title: 'Caso E — IRS con decisión final incorrecta', difficulty: 'normal',
+      story: 'Se cobró una falta personal común. El árbitro y su compañero fueron al IRS (uso correcto) y la mantuvieron común cuando era flagrante (decisión final incorrecta). La causa automática alcanza a los dos que fueron a la revisión.',
+      t: game('normal', [...rep(15, () => P('CCM')), P('ICCM', { incident: 'shootingFoul', reviews: [{ type: 'irs', use: 'ok', decision: 'ko', refs: [REF, OTRO] }] })]) }
+  ];
 })();

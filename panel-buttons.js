@@ -2,6 +2,11 @@
    Cada botón es [texto en pantalla, key]. La key es la que se guarda en los datos y la que usa
    scoring-criteria.js: si cambiás el texto, dejá la misma key. Para agregar un botón, sumá una fila
    con una key nueva (sin tildes ni espacios, en camelCase). */
+// Configuración general
+window.CONFIG = {
+  sendTo: 'evaluaciones@deptoarbitral.com',  // correo al que se envía cada evaluación terminada
+  tutorialUrl: ''                             // enlace de YouTube del video de instrucciones (ej.: 'https://www.youtube.com/watch?v=XXXXXXXXXXX')
+};
 (function () {
   const mk = (id, title, items, extra) => ({ id, title, ...extra, buttons: items.map(([label, key]) => ({ label, key })) });
 
@@ -24,7 +29,7 @@
     mk('others', 'Otros', [['Demora', 'delay'], ['Conducta', 'behaviour'], ['Control del banco', 'benchControl'], ['Saque rápido', 'quickInbound']], { group: 'incidentType' }),
     mk('review', 'Sistema de revisión', [['✅ Uso IRS', 'correctUseIrs'], ['⛔ Uso IRS', 'incorrectUseIrs'], ['✅ Challenge', 'correctChallenge'], ['⛔ Challenge', 'incorrectChallenge']]),
     mk('tags', 'Tags', [
-      ['Cobro cruzado/DW', 'crossedCallDw'], ['Llamada fantasma', 'phantomCall'],
+      ['Cobro cruzado/DW', 'crossedCallDw'], ['Llamada fantasma', 'phantomCall'], ['Ventaja/Desventaja', 'advantagePrinciple'],
       ['Posicionamiento', 'mechanicsPositioning'], ['Rotación', 'rotation'], ['IOT', 'iot'],
       ['Comunicación', 'communication'], ['Protocolos', 'protocols'], ['Manejo del partido', 'gameManagement'],
       ['Control de detalles', 'gameDetailsControl'], ['Uso de señales', 'useOfSignals'], ['Trabajo en equipo', 'teamwork'],
@@ -43,6 +48,7 @@
   window.TAG_ALLOWED = {
     crossedCallDw:        ['neg'],
     phantomCall:          ['supNeg', 'neg'],
+    advantagePrinciple:   ['neg', 'pos'],
     mechanicsPositioning: ['neg', 'pos'],
     rotation:             ['neg', 'pos'],
     iot:                  ['neg', 'pos'],
@@ -51,6 +57,10 @@
     useOfSignals:         ['neg', 'pos']
   };
   window.tagAllows = (tag, val) => !window.TAG_ALLOWED[tag] || window.TAG_ALLOWED[tag].includes(val);
+  // Resultado del Challenge (solo Challenge, no IRS). Se registra para estadísticas; no suma ni resta puntos.
+  window.CHALLENGE_RESULT = { won: 'Ganado', lost: 'Perdido', unclear: 'Video no claro' };
+  // Torneos FUBB para el selector (se puede escribir otro)
+  window.TOURNAMENTS = ['LUB', 'LDA', 'DTA', 'Formativas'];
   // Posiciones de la terna: key guardada → nombre en pantalla y abreviatura
   window.ROLES = { L: ['Líder', 'LÍD'], C: ['Central', 'CEN'], T: ['Seguidor', 'SEG'] };
   // Períodos: duración en segundos

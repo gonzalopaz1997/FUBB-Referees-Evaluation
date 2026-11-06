@@ -18,124 +18,92 @@ body{font-size:16px;line-height:1.5}.sr{max-width:1000px;margin:auto;padding:12p
 </style></head><body><div id="h"></div><div class="sr" id="app"></div>
 <script src="panel-buttons.js"></script><script src="scoring-criteria.js"></script><script src="scoring-examples.js"></script><script src="store.js"></script><script>
 document.getElementById('h').innerHTML=hdr('Reglas de puntaje',hdrInfo(Store.get()),1);
-const C=SCORING_CRITERIA,Z=x=>Math.round(x*100),f=x=>x==null?'–':(Math.round(x*100)/100),sc=n=>`<span class="sc sc${n}">${n}</span>`,L=n=>C.scoreLabels[n];
-const sup=C.levels.find(l=>l.score==5).min,abv=C.levels.find(l=>l.score==4).min,std=C.levels.find(l=>l.score==3).min;
-const NM=C.negativeMarks.maxPerGame,AS=Z(C.autoGameShare),SS=Z(C.sustainedShare);
-const trig=n=>{let k=1;while(!(k/n>C.autoGameShare))k++;return k};
+const C=SCORING_CRITERIA,f=scoreFmt,L=n=>C.scoreLabels[n],sc=n=>`<span class="sc sc${n}">${n}</span>`;
+const band=v=>{const l=levelOfScore(v);return `<span class="sc sc${l.score}" style="width:auto;padding:0 .45em;border-radius:1em">${f(v)}</span>`};
 const VL={supNeg:['−−','n'],neg:['−','n'],pos:['+','p'],supPos:['++','pp']};
 const chip=v=>`<span class="tagp ${VL[v][1]}">${VL[v][0]}</span>`;
 const TAGB=PANEL_BUTTONS.find(c=>c.id=='tags').buttons,tl=k=>(TAGB.find(b=>b.key==k)||{label:k}).label;
-const tagRows=()=>{const own={};C.areas.forEach(a=>(a.tags||[]).forEach(t=>own[t]=a.short));['crossedCallDw','phantomCall'].forEach(t=>own[t]='Cobros (puntos del cobro)');
-return TAGB.map(b=>{const al=(TAG_ALLOWED&&TAG_ALLOWED[b.key])||['supNeg','neg','pos','supPos'];
-return `<tr><td>${b.label}</td><td>${al.map(chip).join(' ')}</td><td>${own[b.key]||'No suma puntaje (solo aparece en Áreas de mejora)'}</td></tr>`}).join('')};
-const areaRows=()=>C.areas.map((a,i)=>`<tr><td><b>${i+1}. ${a.label}</b></td><td>${a.source=='calls'?'Cada cobro de <b>falta o violación</b> (incidentes de Faltas / Violaciones). Resultado del cobro + los tags Cobro cruzado/DW y Llamada fantasma.':a.tags.map(tl).join(', ')}</td></tr>`).join('');
-const autoRows=sc_=>C.autoCauses.filter(c=>c.score==sc_).map(c=>`<tr><td>${c.fiba}</td><td>${c.label}</td><td class="c">${sc(c.score)}</td><td>${c.area?C.areas.find(a=>a.key==c.area).short:'Solo juego / global'}</td></tr>`).join('');
-const trigTable=()=>`<table class="tb" style="width:auto"><tr><th>Juegos dirigidos</th>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<th class="c">${n}</th>`).join('')}</tr><tr><td>Juegos automáticos que lo activan</td>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<td class="c">${trig(n)}+</td>`).join('')}</tr></table>`;
-
-/* ---------- ejemplos (calculados con el motor real) ---------- */
-const R0=SCORING_EXAMPLE_REF;
-const lv=s=>(C.levels.find(l=>l.score==s)||{label:''}).label;
-function exampleHTML(e){const r=assessReferee(e.tournament,R0),n=r.games,A=C.areas;
-const rows=r.byGame.map(g=>`<tr><td class="c">${g.n}</td><td class="c">${g.calls.ok} ✓ / ${g.calls.bad} ✗</td>${A.map(a=>{const own=g.causes.some(c=>c.area==a.key);return `<td class="c ${own?'bad':''}">${f(g.scores[a.key])}<br><small>${g.marks[a.key]} neg${own?' · auto':''}</small></td>`}).join('')}<td class="${g.causes.length?'bad':''}">${g.causes.length?g.causes.map(c=>c.label).join('<br>'):'–'}</td></tr>`).join('');
-const arows=Object.entries(r.areas).map(([k,x])=>{const why=x.defaulted?'Sin tags registrados → 3 por defecto':x.reason=='negMarks'?`<b>${f(x.negPerGame)}</b> marcas negativas por juego (${x.negTotal} en ${n} juegos) es más que ${NM} → <b>2</b>`:x.reason=='autoGames'?`<b>${x.ownedAuto} de ${n}</b> juegos (${Z(x.ownedAuto/n)}%) tienen una causa automática del área, más del ${AS}% → <b>2</b>`:x.reason=='merit'?`Promedio ${f(x.raw)} y <b>${x.score==5?x.superiorGames:x.aboveGames} de ${n}</b> juegos en ${x.score==5?sup:abv}+ (necesita ${SS}%) → <b>${x.score}</b>`:`Promedio ${f(x.raw)} puntos, ${f(x.negPerGame)} marcas negativas por juego, ${x.ownedAuto?x.ownedAuto+' juego(s) automático(s)':'ningún juego automático'}; ninguna regla lo mueve → <b>3</b>`;
-return `<tr><td>${x.label}</td><td class="c">${f(x.raw)}</td><td class="c">${f(x.negPerGame)}</td><td class="c">${x.ownedAuto}/${n}</td><td class="c">${sc(x.score)}</td><td>${why}</td></tr>`}).join('');
-const oi=r.overallInfo,scores=Object.values(r.areas).map(x=>x.score);
-const ovLine=`Promedio de los cinco puntajes por área: (${scores.join(' + ')}) ÷ ${scores.length} = <b>${f(oi.avgAreas)}</b> → ${sc(C.levels.find(l=>oi.avgAreas>=l.min).score)} ${lv(C.levels.find(l=>oi.avgAreas>=l.min).score)}`;
-return `<div class="ex" id="ex${e.score}"><h3>${sc(e.score)} ${e.title}</h3><p>${e.story}</p>
-<div class="sc-wrap"><table class="tb"><tr><th class="c">Juego</th><th class="c">Cobros correctos ✓ / incorrectos ✗</th>${A.map(a=>`<th class="c">${a.short}<br><small>pts · marcas neg.</small></th>`).join('')}<th>Causa automática</th></tr>${rows}</table></div>
-<p class="mu">Cada celda: promedio de puntos del juego en el área y cantidad de marcas negativas (tags − / −−). En rojo: área forzada por una causa automática.</p>
-<h3>Puntajes por área</h3><div class="sc-wrap"><table class="tb"><tr><th>Área</th><th class="c">Prom. pts</th><th class="c">Neg. / juego</th><th class="c">Juegos auto</th><th class="c">Puntaje</th><th>Por qué</th></tr>${arows}</table></div>
-<h3>Global</h3><ul><li>${ovLine}</li>${oi.reasons.map(x=>`<li>${x}</li>`).join('')}${!oi.reasons.length&&oi.autoGames==0?'<li>Ningún juego con causa automática, así que no se aplica ningún tope.</li>':''}</ul>
-<div class="ov2">${sc(r.overall)}<div><b style="font-size:1.15em">Global: ${r.overall} — ${r.overallLabel}</b></div></div></div>`}
-
-const mkG=(ok,bad,dif)=>({games:[{id:1,n:1,difficulty:dif,plays:[...Array(ok).fill(0).map(()=>({referee:R0,call:'CCM',cat:'fouls',incident:'blockCharge',tags:{},review:[],rules:{}})),...Array(bad).fill(0).map(()=>({referee:R0,call:'ICCM',cat:'fouls',incident:'blockCharge',tags:{},review:[],rules:{}}))]}]});
-const DIFF_TABLE=`<table class="tb"><tr><th>Cobros registrados</th>${['easy','normal','hard'].map(d=>`<th class="c">Juego ${C.difficulty.labels[d].toLowerCase()}</th>`).join('')}</tr>${[[6,0],[5,1],[4,2]].map(([ok,bad])=>`<tr><td>${ok} correctos, ${bad} incorrecto(s) <small>(${f(assessReferee(mkG(ok,bad,'normal'),R0).areas.callSelection.raw)} pts)</small></td>${['easy','normal','hard'].map(d=>{const a=assessReferee(mkG(ok,bad,d),R0).areas.callSelection;return `<td class="c ${a.score>=4?'good':''}">${f(a.raw)} pts → ${sc(a.score)}</td>`}).join('')}</tr>`).join('')}</table>`;
-const CR='los últimos 2:00 del 4.º cuarto y todo el tiempo extra';
+const own={};C.areas.forEach(a=>(a.tags||[]).forEach(t=>own[t]=a.label));C.callTags.forEach(t=>own[t]='Selección de cobros (califica el cobro)');
+const tagRows=TAGB.map(b=>`<tr><td>${b.label}</td><td>${((TAG_ALLOWED||{})[b.key]||['supNeg','neg','pos','supPos']).map(chip).join(' ')}</td><td>${own[b.key]||'No suma puntaje (solo aparece en Áreas de mejora)'}</td></tr>`).join('');
+const amp=x=>3+(x-3)*(1+C.specialAmplify),A=Math.round(C.specialAmplify*100),D=C.difficulty;
+const lev=C.levels;
+const mk=(ok,bad,d)=>({games:[{id:1,difficulty:d,plays:[...Array(ok).fill(0).map(()=>({refs:[{name:'X',role:'L'}],call:'CCM',cat:'fouls',incident:'blockCharge',tags:{}})),...Array(bad).fill(0).map(()=>({refs:[{name:'X',role:'L'}],call:'ICCM',cat:'fouls',incident:'blockCharge',tags:{}}))]}]});
+const diffRows=[[8,0],[7,1],[5,3]].map(([o,b])=>`<tr><td>${o} correctas, ${b} incorrecta(s)</td>${['easy','normal','hard'].map(d=>{const a=assessReferee(mk(o,b,d),'X').areas.callSelection.score;return `<td class="c">${band(a)}</td>`}).join('')}</tr>`).join('');
+function ex(e){const r=assessReferee(e.t,SCORING_EXAMPLE_REF),x=r.byGame[0];
+return `<div class="ex"><h3>${band(r.overall)} ${e.title}</h3><p>${e.story} <span class="mu">Dificultad: ${D.labels[e.difficulty]}.</span></p>
+<table class="tb"><tr><th>Área</th><th class="c">Puntos</th><th class="c">Promedio</th><th class="c">Dificultad</th><th class="c">Tope</th><th class="c">Puntaje</th></tr>${Object.values(x.areas).map(a=>`<tr><td>${a.label}</td><td class="c">${a.n}</td><td class="c">${a.defaulted?'sin puntos':f(a.raw)}</td><td class="c">${a.defaulted?'–':(a.adj>0?'+':'')+f(a.adj)}</td><td class="c">${a.capped?'máx. '+f(Math.min(...a.capped.map(c=>C.causeCap[c.score]))):'–'}</td><td class="c">${band(a.score)}</td></tr>`).join('')}
+<tr class="hl"><td><b>Global</b> = promedio de las áreas${r.reasons.length?' con tope':''}</td><td></td><td class="c">${f(x.avgAreas)}</td><td></td><td class="c">${r.reasons.length?'máx. '+f(Math.min(...x.causes.map(c=>C.causeCap[c.score]),x.areas&&Object.values(x.areas).some(a=>a.score<C.areaBelow)?C.globalCapIfAreaBelow:9)):'–'}</td><td class="c">${band(r.overall)}</td></tr></table>
+${x.causes.length?`<p class="mu">Causa automática: ${x.causes.map(c=>c.label).join('; ')}.</p>`:''}</div>`}
 document.getElementById('app').innerHTML=`
 <h2 style="margin-top:8px">Reglas de puntaje</h2>
-<p>Esta página explica paso a paso cómo se calcula la <b>evaluación</b> de cada árbitro. Todos los números se leen de la configuración del puntaje, así que siempre coinciden con lo que hace la herramienta. Los ejemplos del final los calcula la propia herramienta.</p>
-<div class="toc"><a href="#s1">1 · La escala</a><a href="#s2">2 · Qué se registra</a><a href="#s3">3 · Las cinco áreas</a><a href="#s4">4 · Puntaje del área</a><a href="#s5">5 · Dificultad del juego</a><a href="#s6">6 · Resultados automáticos</a><a href="#s7">7 · Error de reglas</a><a href="#s8">8 · Global</a><a href="#s9">9 · Ejemplos</a></div>
-<div class="flow"><div><b>1. Jugadas</b>Se registra cada jugada y se le ponen tags.</div><div><b>2. Juegos</b>Cada juego se revisa en busca de causas automáticas.</div><div><b>3. Áreas</b>Cinco áreas, cada una empieza en 3.</div><div><b>4. Global</b>Promedio de las áreas, con topes.</div></div>
-<div class="box"><b>La idea central:</b> ${sc(3)} <b>${L(3)} es el punto de partida y el promedio.</b> Un árbitro queda en 3 salvo que tenga demasiadas marcas negativas o juegos automáticamente por debajo del estándar (entonces 2), o un rendimiento sostenido y claramente destacado (entonces 4, y excepcionalmente 5). Un 1 o un 5 son excepcionales.</div>
+<p>Así se calcula la evaluación de cada árbitro en <b>un partido</b>. Todos los números de esta página se leen de la configuración del puntaje, así que siempre coinciden con lo que hace la herramienta, y los ejemplos del final los calcula la propia herramienta.</p>
+<div class="toc"><a href="#s1">1 · La escala</a><a href="#s2">2 · Qué se registra</a><a href="#s3">3 · Puntos de cada jugada</a><a href="#s4">4 · Puntaje de cada área</a><a href="#s5">5 · Dificultad</a><a href="#s6">6 · Causas automáticas</a><a href="#s7">7 · Global</a><a href="#s8">8 · Consolidado</a><a href="#s9">9 · Ejemplos</a></div>
+<div class="flow"><div><b>1. Jugadas</b>Cada decisión y cada tag da puntos (de 1 a 5).</div><div><b>2. Áreas</b>Cada área promedia sus puntos y se ajusta por dificultad.</div><div><b>3. Global</b>Promedio de las cinco áreas, con dos decimales.</div><div><b>4. Topes</b>Las decisiones graves limitan el puntaje.</div></div>
+<div class="box"><b>La idea central:</b> <b>3,00 es el estándar.</b> Las decisiones correctas valen ${f(C.callPoints.correct)} y las incorrectas ${f(C.callPoints.incorrect)}; los tags suben o bajan el promedio de su área. Solo las <b>decisiones graves</b> de la sección 6 son causa automática de “Por debajo del estándar” o “No aceptable”. <b>Los tags por sí solos nunca son causa automática</b>: bajan o suben el promedio, pero no imponen un tope.</div>
 
 <h2 id="s1">1 · La escala</h2>
-<table class="tb"><tr><th class="c">Puntaje</th><th>Nombre</th><th>Significado</th><th>Cómo se llega</th></tr>
-<tr><td class="c">${sc(5)}</td><td><b>${L(5)}</b></td><td>Excepcional. El árbitro se destaca en un área juego tras juego.</td><td>Promedio del área ≥ <b>${sup}</b> en al menos el <b>${SS}%</b> de los juegos, sin causa automática. Un global 5 necesita esto en prácticamente todas las áreas.</td></tr>
-<tr><td class="c">${sc(4)}</td><td><b>${L(4)}</b></td><td>Claramente mejor que el estándar, sostenido en el tiempo: no un solo buen juego.</td><td>Promedio del área ≥ <b>${abv}</b> en al menos el <b>${SS}%</b> de los juegos, sin causa automática (por ejemplo cobros correctos de forma amplia, o tags positivos constantes).</td></tr>
-<tr class="hl"><td class="c">${sc(3)}</td><td><b>${L(3)}</b></td><td>El estándar esperado: aplicación correcta de técnicas y criterios, con errores ocasionales que no se repiten. <b>El árbitro promedio.</b></td><td>El punto de partida de cada área. Se queda acá salvo que una regla de abajo lo mueva.</td></tr>
-<tr><td class="c">${sc(2)}</td><td><b>${L(2)}</b></td><td><i>FIBA:</i> un rendimiento que no alcanza el estándar esperado y no demuestra de forma constante la aplicación básica de técnicas y criterios. Se requiere mejorar en varias áreas clave.</td><td>Más de <b>${NM}</b> marcas negativas por juego en un área, o juegos automáticamente por debajo del estándar en más del <b>${AS}%</b> de los juegos (área y global).</td></tr>
-<tr><td class="c">${sc(1)}</td><td><b>${L(1)}</b></td><td><i>FIBA:</i> un rendimiento que no cumple las expectativas básicas de jugadores, entrenadores y público; el árbitro no demostró las competencias mínimas del nivel y cumplió uno o más criterios obligatorios de evaluación inaceptable.</td><td>Juegos No aceptables (sección 6) en más del <b>${Z(C.notAcceptableGameShare)}%</b> de los juegos → global 1. Un juego individual también puede quedar en 1.</td></tr></table>
+<p>El puntaje se muestra con dos decimales (por ejemplo ${f(3.54)}), porque combina muchas variables y la diferencia entre ${f(3.1)} y ${f(3.6)} importa.</p>
+<table class="tb"><tr><th class="c">Nivel</th><th>Nombre</th><th class="c">Puntaje</th><th>Significado</th></tr>
+<tr><td class="c">${sc(5)}</td><td><b>${L(5)}</b></td><td class="c">${f(lev[0].min)} a ${f(C.maxPoint)}</td><td>Excepcional: decisiones clave correctas y se destaca en todas las áreas.</td></tr>
+<tr><td class="c">${sc(4)}</td><td><b>${L(4)}</b></td><td class="c">${f(lev[1].min)} a ${f(lev[0].min-0.01)}</td><td>Claramente mejor que el estándar.</td></tr>
+<tr class="hl"><td class="c">${sc(3)}</td><td><b>${L(3)}</b></td><td class="c">${f(lev[2].min)} a ${f(lev[1].min-0.01)}</td><td>El estándar esperado: técnicas y criterios bien aplicados, con errores ocasionales.</td></tr>
+<tr><td class="c">${sc(2)}</td><td><b>${L(2)}</b></td><td class="c">${f(lev[3].min)} a ${f(lev[2].min-0.01)}</td><td><i>FIBA:</i> no alcanza el estándar esperado; se requiere mejorar en varias áreas clave.</td></tr>
+<tr><td class="c">${sc(1)}</td><td><b>${L(1)}</b></td><td class="c">menos de ${f(lev[3].min)}</td><td><i>FIBA:</i> no cumple las expectativas básicas; cumplió uno o más criterios de evaluación inaceptable.</td></tr></table>
 
-<h2 id="s2">2 · Qué se registra</h2>
-<h3>Resultado del cobro</h3>
-<table class="tb"><tr><th>Botón</th><th>Significado</th><th>Abreviatura</th><th>Cuenta como</th></tr><tr><td><b>COBRO CORRECTO</b></td><td>El cobro estuvo bien</td><td>CC</td><td>Correcto</td></tr><tr><td><b>COBRO INCORRECTO</b></td><td>Se cobró algo que no correspondía</td><td>CI</td><td>Incorrecto</td></tr><tr><td><b>NO COBRO INCORRECTO</b></td><td>Había que cobrar y no se cobró</td><td>NCI</td><td>Incorrecto</td></tr><tr><td><b>NO COBRO CORRECTO</b></td><td>No había nada que cobrar y no se cobró</td><td>NCC</td><td>Correcto</td></tr></table>
-<p>Solo las <b>Faltas</b> y <b>Violaciones</b> suman a Selección de cobros. Los incidentes “Otros” y el Sistema de revisión no dan puntos de cobro, pero pueden activar resultados automáticos. Cada jugada se registra con su <b>posición</b> (Líder, Central o Seguidor) y el <b>árbitro</b> que la cobró, por separado, porque en 5x5 las posiciones cambian durante el juego.</p>
-<h3>Puntos de cada jugada</h3>
-<table class="tb"><tr><th></th><th>Valor</th><th>Puntos</th></tr>
-<tr><td rowspan="2">Selección de cobros</td><td>Cobro correcto</td><td>${C.callPoints.correct.default} pts. Un cobro correcto (COBRO CORRECTO / NO COBRO CORRECTO) nunca vale más de ${C.correctCallMax}, ni siquiera en una Jugada especial ★</td></tr>
-<tr><td>Cobro incorrecto</td><td>${C.callPoints.incorrect.default} pts — ${C.callPoints.incorrect.supNeg} si tiene un tag muy negativo</td></tr>
-<tr><td rowspan="4">Tags de las otras cuatro áreas</td><td>${chip('supNeg')} muy negativo</td><td>${C.tagPoints.supNeg}</td></tr><tr><td>${chip('neg')} negativo</td><td>${C.tagPoints.neg}</td></tr><tr><td>${chip('pos')} positivo</td><td>${C.tagPoints.pos}</td></tr><tr><td>${chip('supPos')} muy positivo</td><td>${C.tagPoints.supPos}</td></tr>
-<tr><td>Jugada especial ★<br><small>Solo para jugadas de impacto en el juego</small></td><td>Correcta / incorrecta</td><td>Puntos × ${C.importantPlayFactor.correct} si el cobro es correcto, × ${C.importantPlayFactor.incorrect} si es incorrecto (máximo ${C.maxPoint}). Excepción: un cobro correcto (COBRO CORRECTO / NO COBRO CORRECTO) nunca supera ${C.correctCallMax}</td></tr></table>
-<p><b>Ejemplo:</b> un tag positivo en una jugada normal vale ${C.tagPoints.pos}; en una Jugada especial con cobro correcto vale ${C.tagPoints.pos} × ${C.importantPlayFactor.correct} = <b>${f(C.tagPoints.pos*C.importantPlayFactor.correct)}</b>. Es la única forma de que los tags que solo admiten − y + (como Posicionamiento o Rotación) pasen de ${C.tagPoints.pos}.</p>
-<h3>Tags, calificaciones permitidas y dónde cuentan</h3>
-<table class="tb"><tr><th>Tag</th><th>Calificaciones habilitadas</th><th>Área a la que suma</th></tr>${tagRows()}</table>
-<p><b>Marca negativa</b> = cualquier tag calificado ${chip('neg')} o ${chip('supNeg')}. Los tags positivos nunca anulan marcas negativas: solo suben el promedio de puntos.</p>
+<h2 id="s2">2 · Qué se registra en cada jugada</h2>
+<table class="tb"><tr><th>Dato</th><th>Cómo se usa</th></tr>
+<tr><td><b>Resultado del cobro</b></td><td>COBRO CORRECTO y NO COBRO CORRECTO cuentan como correctos; COBRO INCORRECTO y NO COBRO INCORRECTO, como incorrectos. Solo las <b>faltas</b> y <b>violaciones</b> suman a Selección de cobros.</td></tr>
+<tr><td><b>Posición y árbitro</b></td><td>Cada jugada guarda qué árbitro decidió y desde qué posición (Líder, Central o Seguidor). Con <b>Varios</b> se marcan dos o tres árbitros, cada uno con su posición: la jugada cuenta en la evaluación de cada uno.</td></tr>
+<tr><td><b>IRS / Challenge</b></td><td>Se registra el <b>uso</b> (correcto o incorrecto), la <b>decisión final</b> luego de mirar la imagen (correcta, incorrecta o sin decisión si la imagen no permitió ver la acción) y <b>qué árbitros fueron</b> a la revisión (normalmente dos). Esa calificación cuenta para los que fueron, que son los responsables de la decisión final. En el Challenge también se registra el resultado (ganado, perdido o video no claro): sirve para las estadísticas y el seguimiento, pero <b>no suma ni resta puntos</b>, porque el cobro original ya se califica con Resultado del cobro.</td></tr>
+<tr><td><b>Tags</b></td><td>Señalan qué debe trabajar o qué hizo bien el árbitro. Suben o bajan el promedio de su área (sección 3).</td></tr>
+<tr><td><b>Error de reglas</b></td><td>Error en el conocimiento de las reglas, con impacto Malo o Muy malo para cada árbitro (sección 6). Comentario obligatorio.</td></tr>
+<tr><td><b>Jugada especial ★</b></td><td>Solo para jugadas de impacto en el juego. Sus puntos pesan un ${A}% más (sección 3).</td></tr>
+<tr><td><b>Tiempo crucial</b></td><td>Se marca solo según el tiempo: los últimos 2:00 del 4.º cuarto y todo el tiempo extra. Algunas causas automáticas son más graves en tiempo crucial.</td></tr></table>
 
-<h2 id="s3">3 · Las cinco áreas</h2>
-<table class="tb"><tr><th>Área</th><th>Se alimenta de</th></tr>${areaRows()}</table>
-<p>En cada juego, cada área recibe el <b>promedio de puntos</b> de sus jugadas en ese juego. El promedio total es el promedio de los promedios de cada juego. Antes, el promedio de cada juego se ajusta por la dificultad del juego (sección 5).</p>
-<div class="box y"><b>Área sin puntos:</b> si un árbitro no tiene ningún tag en un área en todos sus juegos, esa área recibe <b>${C.noData.score} (${L(C.noData.score)})</b> por defecto en lugar de quedar vacía. Si tiene tags solo en algunos juegos, el área se promedia normalmente.</div>
+<h2 id="s3">3 · Puntos de cada jugada</h2>
+<table class="tb"><tr><th>Área</th><th>Qué da puntos</th><th class="c">Puntos</th></tr>
+<tr><td rowspan="3">Selección de cobros</td><td>Decisión correcta (falta o violación)</td><td class="c">${f(C.callPoints.correct)}</td></tr>
+<tr><td>Decisión incorrecta</td><td class="c">${f(C.callPoints.incorrect)}</td></tr>
+<tr><td>Decisión incorrecta con Llamada fantasma ${chip('supNeg')}</td><td class="c">${f(C.callPoints.incorrectVeryNegative)}</td></tr><tr><td>Selección de cobros</td><td>Tag Principio de Ventaja/Desventaja ${chip('neg')} · ${chip('pos')}</td><td class="c">${f(C.tagPoints.neg)} · ${f(C.tagPoints.pos)}</td></tr>
+<tr><td rowspan="2">Selección de cobros<br><small>solo para los árbitros que fueron a la revisión</small></td><td>IRS / Challenge: uso correcto · uso incorrecto</td><td class="c">${f(C.reviewPoints.useOk)} · ${f(C.reviewPoints.useKo)}</td></tr>
+<tr><td>Decisión final correcta · incorrecta · sin decisión</td><td class="c">${f(C.reviewPoints.decisionOk)} · ${f(C.reviewPoints.decisionKo)} · no suma</td></tr>
+<tr><td rowspan="4">Las otras cuatro áreas</td><td>Tag ${chip('supNeg')} muy negativo</td><td class="c">${f(C.tagPoints.supNeg)}</td></tr><tr><td>Tag ${chip('neg')} negativo</td><td class="c">${f(C.tagPoints.neg)}</td></tr><tr><td>Tag ${chip('pos')} positivo</td><td class="c">${f(C.tagPoints.pos)}</td></tr><tr><td>Tag ${chip('supPos')} muy positivo</td><td class="c">${f(C.tagPoints.supPos)}</td></tr></table>
+<p><b>Jugada especial ★:</b> todos sus puntos se alejan un ${A}% más del 3, hacia arriba si fue buena y hacia abajo si fue mala. Decisión correcta ${f(C.callPoints.correct)} → ${f(amp(C.callPoints.correct))}; incorrecta ${f(C.callPoints.incorrect)} → ${f(amp(C.callPoints.incorrect))}; tag + ${f(C.tagPoints.pos)} → ${f(amp(C.tagPoints.pos))}; tag − ${f(C.tagPoints.neg)} → ${f(amp(C.tagPoints.neg))}.</p>
+<h3>Tags y área a la que suman</h3>
+<table class="tb"><tr><th>Tag</th><th>Calificaciones habilitadas</th><th>Área</th></tr>${tagRows}</table>
 
-<h2 id="s4">4 · Puntaje del área, paso a paso</h2>
-<ol>
-<li><b>Empieza en ${sc(3)} ${L(3)}.</b> Es el árbitro promedio.</li>
-<li><b>Demasiadas marcas negativas → ${sc(2)}.</b> Se cuentan los tags − y −− del área y se dividen por la cantidad de juegos que dirigió el árbitro. Si el resultado es <b>más de ${NM}</b>, el área queda en ${C.belowStandardScore}.<br><span class="mu">Ejemplo: 30 tags negativos en Mecánica en 8 juegos = 3,75 por juego → 2. Con 20 tags (2,5 por juego) queda en 3.</span></li>
-<li><b>Juegos automáticos → ${sc(2)}.</b> Si <b>más del ${AS}%</b> de los juegos tiene una causa automática que pertenece al área (sección 6), el área queda en ${C.belowStandardScore}. Un juego con esa causa también cuenta como ${C.belowStandardScore} (o 1) dentro del promedio del área.${trigTable()}<span class="mu">Lectura: con 8 juegos, 2 juegos automáticos (25%) lo activan; 1 juego (12,5%) no.</span></li>
-<li><b>Mérito sostenido → ${sc(4)} o ${sc(5)}.</b> Solo si no hay causa automática en el área <b>y</b> el promedio llega a <b>${abv}</b> (para 4) o <b>${sup}</b> (para 5) <b>y</b> al menos el <b>${SS}%</b> de los juegos del árbitro alcanza ese nivel por sí solo.<br><span class="mu">Ejemplo: 8 juegos, promedio 3,92. Siete juegos están en ≥ ${abv} → sostenido → 4. Si solo 3 juegos estuvieran en ≥ ${abv} (un juego enorme que sube el promedio), quedaría en 3.</span></li>
-<li>Si no, el área queda en ${sc(3)}. Un promedio bajo por sí solo <b>no</b> da 2: solo lo dan demasiadas marcas negativas o juegos automáticos.</li></ol>
-<p>Un <b>5</b> necesita un promedio de ${sup} o más. Los tags + valen ${C.tagPoints.pos}, así que 4,5+ sale de tags ++ (${C.tagPoints.supPos}; solo disponibles en Manejo del partido, Control de detalles, Trabajo en equipo y Control emocional) y de Jugadas especiales correctas (× ${C.importantPlayFactor.correct}, por ejemplo ${f(C.tagPoints.pos*C.importantPlayFactor.correct)} para un tag +). Por eso es poco común.</p>
+<h2 id="s4">4 · Puntaje de cada área</h2>
+<ol><li>Se promedian los puntos del área en el partido.</li>
+<li>Se suma el ajuste por dificultad (sección 5).</li>
+<li>El resultado queda entre ${f(C.minPoint)} y ${f(C.maxPoint)}.</li>
+<li>Si el área no tiene ningún punto en el partido, queda en <b>${f(C.noDataScore)}</b> (estándar) y no se ajusta por dificultad.</li>
+<li>Si el área tiene una causa automática propia (sección 6), queda limitada al tope de esa causa.</li></ol>
+<p class="mu">Ejemplo: Mecánica con un tag + (${f(C.tagPoints.pos)}) y uno − (${f(C.tagPoints.neg)}) → promedio ${f(3)}. Con un solo tag −, el área queda en ${f(C.tagPoints.neg)}: el evaluador solo vio ese aspecto y fue negativo.</p>
 
-<h2 id="s5">5 · Dificultad del juego</h2>
-<p>Al terminar el juego, el evaluador elige qué tan exigente fue para los árbitros: <b>Fácil</b>, <b>Normal</b> o <b>Difícil</b>. El mismo rendimiento vale más en un juego difícil y menos en uno fácil, para dar más mérito al árbitro que trabajó bien en un juego difícil y no sobrevalorar los puntajes de juegos fáciles.</p>
-<table class="tb"><tr><th>Dificultad</th><th>Juego típico</th><th class="c">Puntos que se suman al promedio del juego en cada área</th></tr>
-<tr><td><b>${C.difficulty.labels.easy}</b></td><td>Pocas jugadas discutidas, baja intensidad, jugadores y bancos bajo control.</td><td class="c">${C.difficulty.adjust.easy}</td></tr>
-<tr class="hl"><td><b>${C.difficulty.labels.normal}</b></td><td>Un juego típico (también se usa cuando no se eligió dificultad).</td><td class="c">0</td></tr>
-<tr><td><b>${C.difficulty.labels.hard}</b></td><td>Alta intensidad, muchas jugadas discutidas o complejas, presión sobre los árbitros.</td><td class="c">+${C.difficulty.adjust.hard}</td></tr></table>
-<p>El ajuste se aplica al <b>promedio de puntos</b> del juego (entre 0 y ${C.maxPoint}), antes del control de mérito 4 / 5 de la sección 4. <b>No</b> cambia la cantidad de marcas negativas ni las causas automáticas: un error de reglas o una flagrante no cobrada son iguales en cualquier juego.</p>
-<h3>Ejemplo: las mismas jugadas, tres juegos distintos</h3>
-<p>Un árbitro dirige un juego y todas las jugadas se registran igual. Solo cambia la dificultad. Área Selección de cobros:</p>
-${DIFF_TABLE}
-<p class="mu">Lectura: si todo fue correcto pero el juego fue fácil, el árbitro queda en 3 (3,7 está por debajo de ${abv}); el mismo rendimiento en un juego difícil alcanza Por encima del estándar. Un juego con 5 de 6 cobros correctos lo alcanza solo si fue difícil.</p>
+<h2 id="s5">5 · Dificultad del partido</h2>
+<p>Al terminar el partido el evaluador elige qué tan exigente fue: <b>Fácil</b>, <b>Normal</b> o <b>Difícil</b>. Da más mérito al árbitro que trabajó bien en un partido difícil y no sobrevalora los partidos fáciles.</p>
+<table class="tb"><tr><th>Dificultad</th><th class="c">Se suma a cada área con puntos</th></tr>${['easy','normal','hard'].map(k=>`<tr${k=='normal'?' class="hl"':''}><td><b>${D.labels[k]}</b></td><td class="c">${D.adjust[k]>0?'+':''}${f(D.adjust[k])}</td></tr>`).join('')}</table>
+<p>No cambia las causas automáticas: una flagrante no cobrada es igual de grave en cualquier partido.</p>
+<h3>Ejemplo: Selección de cobros con las mismas decisiones en tres partidos</h3>
+<table class="tb"><tr><th>Decisiones</th>${['easy','normal','hard'].map(k=>`<th class="c">${D.labels[k]}</th>`).join('')}</tr>${diffRows}</table>
 
-<h2 id="s6">6 · Resultados automáticos por juego</h2>
-<p>Estas situaciones llevan el <b>juego</b> de ese árbitro directamente a Por debajo del estándar (2) o No aceptable (1), sin importar el resto del juego. Vienen de los criterios de evaluación FIBA; la columna derecha muestra cómo los detecta la herramienta. El juego aparece como 2 (o 1) en <i>Evolución por juego</i> y en el informe.</p>
-<h3>Por debajo del estándar (2)</h3>
-<table class="tb"><tr><th>Criterio FIBA</th><th>Cómo se detecta</th><th class="c">Juego</th><th>Cuenta en</th></tr>${autoRows(2)}</table>
-<h3>No aceptable (1)</h3>
-<table class="tb"><tr><th>Criterio FIBA</th><th>Cómo se detecta</th><th class="c">Juego</th><th>Cuenta en</th></tr>${autoRows(1)}</table>
-<div class="box"><b>Qué pasa después:</b>
-<ul><li>Los juegos automáticos que pertenecen a un área cuentan para la regla del ${AS}% de esa área (sección 4). Los errores de reglas y del IRS no pertenecen a ningún área; cuentan para el global.</li>
-<li>Si un árbitro tiene juegos automáticos en <b>más del ${AS}%</b> de los juegos → global ${sc(2)}. Juegos No aceptables en <b>más del ${Z(C.notAcceptableGameShare)}%</b> → global ${sc(1)}.</li>
-<li>Un solo juego automático ya limita el global a <b>${C.overallCapIfAnyAutoGame}</b>, y un área con un juego automático no puede llegar a 4 o 5.</li></ul></div>
-<div class="box y"><b>Tiempo crucial</b> son ${CR}. Se define solo por el tiempo: se marca automáticamente en cada jugada según el período y el tiempo de juego.</div>
-<div class="box r"><b>Lo juzga el evaluador.</b> Algunos criterios FIBA no se pueden detectar con un solo botón: <i>errores repetidos que afectan el resultado del juego</i> y <i>cambio de criterio en los últimos minutos</i>. Reflejalos con las herramientas de arriba: registrá los cobros incorrectos con un tag muy negativo (−−) y marcá las jugadas clave como Jugada especial ★; si la causa es un error de reglas, usá el botón Error de reglas.</div>
+<h2 id="s6">6 · Causas automáticas</h2>
+<p>Son decisiones graves. Cada una <b>limita</b> el puntaje: las de nivel 2 a un máximo de <b>${f(C.causeCap[2])}</b> (Por debajo del estándar) y las de nivel 1 a un máximo de <b>${f(C.causeCap[1])}</b> (No aceptable). Si el promedio ya es menor, queda el promedio. Limitan el global y, cuando tienen área, también esa área. Se evalúan para cada árbitro: la de IRS / Challenge alcanza a los árbitros que fueron a la revisión.</p>
+<table class="tb"><tr><th>Criterio FIBA</th><th>Cómo se detecta</th><th class="c">Tope</th><th>Área</th></tr>${C.autoCauses.map(c=>`<tr><td>${c.fiba}</td><td>${c.label}</td><td class="c">${f(C.causeCap[c.score])}</td><td>${c.area?C.areas.find(a=>a.key==c.area).short:'Solo el global'}</td></tr>`).join('')}</table>
+<div class="box y"><b>Los tags no son causa automática.</b> Muchos tags negativos bajan el promedio de su área (y con él el global), pero no imponen un tope. La única excepción es combinada con una decisión: un <b>error de reglas Malo</b> junto con ${C.rulesError.badCombo.supNeg} tag −− o ${C.rulesError.badCombo.neg} tags − en el mismo partido.</div>
+<div class="box r"><b>Lo juzga el evaluador.</b> Situaciones como errores repetidos que afectan el resultado o un cambio de criterio en los últimos minutos no se detectan con un botón: registralas como decisiones incorrectas, marcá las jugadas clave como Jugada especial ★ y, si corresponde, usá Error de reglas.</div>
 
-<h2 id="s7">7 · Error de reglas (conocimiento de las reglas)</h2>
-<p>Cuando un árbitro muestra un error en el conocimiento de las reglas, tocá <b>Error de reglas</b> en Jugada a jugada. El impacto se califica <b>para cada árbitro por separado</b>: puede ser Malo para uno y Muy malo para otro, o afectar a uno solo. El <b>comentario es obligatorio</b>.</p>
-<table class="tb"><tr><th>Impacto</th><th>Efecto en el juego de ese árbitro</th></tr>
-<tr><td><b>Muy malo</b></td><td>El juego pasa automáticamente a ${sc(2)} ${L(2)}.</td></tr>
-<tr><td><b>Malo</b></td><td>Solo no cambia el puntaje del juego (aparece en Áreas de mejora como “Conocimiento de reglas”). Combinado, en el mismo juego, con <b>${C.rulesError.badCombo.supNeg} tag muy negativo (−−)</b> o <b>${C.rulesError.badCombo.neg} tags negativos (−)</b> de ese árbitro, el juego pasa a ${sc(2)}.</td></tr></table>
+<h2 id="s7">7 · Global</h2>
+<ol><li>Promedio de los cinco puntajes por área, con dos decimales.</li>
+<li>Si hay causas automáticas, queda limitado al tope de la más grave (${f(C.causeCap[2])} o ${f(C.causeCap[1])}).</li>
+<li>Si algún área queda debajo de ${f(C.areaBelow)}, el global no puede pasar de ${f(C.globalCapIfAreaBelow)} (no puede estar Por encima del estándar con un área por debajo).</li></ol>
+<p class="mu">Como las áreas sin tags cuentan ${f(C.noDataScore)}, un global alto necesita decisiones correctas <b>y</b> aspectos positivos registrados en varias áreas.</p>
 
-<h2 id="s8">8 · Global</h2>
-<ol><li>Promedio de los cinco puntajes por área → ${sc(5)} desde <b>${sup}</b>, ${sc(4)} desde <b>${abv}</b>, ${sc(3)} desde <b>${std}</b>; si no, ${sc(2)}.</li>
-<li>Si algún área está en 2, el global no puede superar <b>${C.overallCapIfAnyBelow}</b>.</li>
-<li>Si algún juego tiene una causa automática, el global no puede superar <b>${C.overallCapIfAnyAutoGame}</b>.</li>
-<li>Juegos automáticos en más del <b>${AS}%</b> de los juegos → global <b>${C.belowStandardScore}</b>. Juegos No aceptables en más del <b>${Z(C.notAcceptableGameShare)}%</b> → global <b>${C.notAcceptableScore}</b>.</li></ol>
-<p>El global de <b>un solo juego</b> (Evolución por juego) usa las mismas reglas con ese juego: una causa automática da 2 (o 1); si no, es el promedio de las cinco áreas.</p>
-<p class="mu">Como las áreas sin tags cuentan 3, un global 4 necesita la mayoría de las áreas en 4 (por ejemplo 4, 4, 4, 4, 3 → 3,8).</p>
+<h2 id="s8">8 · Consolidado (departamento arbitral)</h2>
+<p>Cuando el departamento carga muchas evaluaciones, cada área de un árbitro es el <b>promedio de sus partidos</b> y el global es el <b>promedio de los globales de sus partidos</b> (cada uno ya con sus topes). También se muestra cuántos partidos tuvieron causa automática.</p>
 
 <h2 id="s9">9 · Ejemplos</h2>
-<p>Cuatro árbitros hipotéticos con 8 juegos cada uno, calculados por la herramienta con las reglas de arriba.</p>
-${SCORING_EXAMPLES.map(exampleHTML).join('')}
+<p>Partidos hipotéticos de un árbitro, calculados por la herramienta con las reglas de arriba.</p>
+${SCORING_EXAMPLES.map(ex).join('')}
 `;
 </script></body></html>
