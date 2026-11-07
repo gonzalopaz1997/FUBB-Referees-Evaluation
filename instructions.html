@@ -1,35 +1,105 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#a39665"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="style.css"><title>Instrucciones</title>
-<style>.vw{position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:1px solid var(--b);background:#000}.vw iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.vph{display:flex;align-items:center;justify-content:center;gap:10px;aspect-ratio:16/9;max-height:220px;width:100%;border:1px dashed var(--b);border-radius:10px;color:#9a978c;background:#151515}.mail{display:inline-block;background:#0b0b0b;border:1px solid var(--b);border-radius:6px;padding:1px 8px;font-weight:700}</style></head><body><div id="h"></div>
-<div class="wrap" style="max-width:860px">
-<div class="card"><h3>Video: cómo evaluar un partido</h3><div id="vid"></div></div>
+<style>
+.tabsI{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:sticky;top:0;z-index:5;background:var(--bg,#121212);padding:6px 0}
+.tabsI button{padding:14px;font-size:1.05em;font-weight:700;display:flex;gap:10px;align-items:center;justify-content:center}.tabsI button.on{background:var(--o);color:#111;border-color:var(--o)}
+.vw{position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:1px solid var(--b);background:#000}.vw iframe,.vw video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.mail{display:inline-block;background:#0b0b0b;border:1px solid var(--b);border-radius:6px;padding:1px 8px;font-weight:700}
+.must{border-color:var(--y)!important}.must h3{color:var(--y)}
+.key{border-left:4px solid var(--o)}
+.card ul{line-height:1.5}.card li{margin:3px 0}
+.toc{display:flex;flex-wrap:wrap;gap:6px}.toc a{border:1px solid var(--b);border-radius:20px;padding:4px 12px;font-size:.85em;color:var(--o2);text-decoration:none}
+.vid-note{font-size:.82em;color:#9a978c;margin-top:6px}
+</style></head><body><div id="h"></div>
+<div class="wrap" style="max-width:900px">
+<div class="tabsI"><button id="b-ev" onclick="tab('ev')">Soy evaluador</button><button id="b-dp" onclick="tab('dp')">Departamento arbitral FUBB</button></div>
 
-<div class="card"><h3>1. Empezar una evaluación</h3><p>Cada evaluación es <b>un partido</b>. En la pantalla de inicio, en <b>Mi evaluación</b>, completá tu nombre como evaluador, elegí el torneo (LUB, LDA, DTA, Formativas u Otro para escribirlo), los equipos y la fecha, y elegí la terna. La lista de árbitros FUBB 2026 ya viene cargada: buscá por nombre o escribí una categoría (N1, N2, D1, D2, SENIOR, F/L). Elegí 3 árbitros (o 2 si es dupla) en orden: Principal, Auxiliar 1, Auxiliar 2. Tu nombre aparece arriba a la derecha en todas las pantallas y queda guardado en el archivo.</p></div>
+<!-- ================= EVALUADOR ================= -->
+<div id="ev">
+<div class="card"><h3>Video: evaluar un partido de principio a fin</h3><div id="vid-ev"></div><div class="vid-note">Unos 5 minutos. El video usa datos de demostración con nombres ficticios.</div></div>
+<div class="card must"><h3>Qué es obligatorio registrar</h3><p>Para que el informe sea válido y los datos sean consistentes es <b>OBLIGATORIO</b> registrar <b>todas las revisiones IRS y Challenge y todas las faltas descalificantes, flagrantes, disruptivas y técnicas</b>.</p><p>Además, <b>registrá la mayor cantidad de jugadas posible</b>, las correctas también. Cuantas más jugadas cargues, más justo es el puntaje de cada árbitro y más útiles son las estadísticas del departamento: un partido con pocas jugadas deja áreas “sin registros”, que cuentan como estándar y no dicen nada del árbitro.</p></div>
+<div class="card"><h3>1. Al llegar a la cancha: abrir el juego</h3><ul>
+<li>En el inicio elegí <b>Mi evaluación</b>.</li>
+<li>Completá tu nombre, el <b>torneo</b> (LUB, LDA, DTA, Formativas u Otro para escribirlo), los equipos y la fecha.</li>
+<li>Elegí la terna en orden: Principal, Auxiliar 1 y Auxiliar 2 (o solo 2 si es dupla). Buscá por nombre o escribí una categoría (N1, N2, D1, D2, SENIOR, F/L).</li>
+<li>Tocá <b>Empezar evaluación</b>, leé el aviso de lo obligatorio y tocá <b>Entendido, empezar</b>.</li></ul></div>
+<div class="card"><h3>2. Durante el juego: cargar jugadas</h3><p>En <b>Jugada a jugada</b>, por cada jugada:</p><ul>
+<li><b>Resultado del cobro:</b> COBRO CORRECTO, COBRO INCORRECTO, NO COBRO INCORRECTO o NO COBRO CORRECTO.</li>
+<li><b>Tiempo:</b> período y reloj (escribí 943 para 09:43). El tiempo crucial (últimos 2:00 del 4C y todo el TE) se marca solo.</li>
+<li><b>Posición y árbitro:</b> tocá la posición (Líder, Central o Seguidor) y el árbitro. Si la decisión fue de más de uno, activá el ícono de <b>Varios</b> y marcá cada árbitro con su posición.</li>
+<li><b>Tipo de incidente</b>, <b>zona de la cancha</b> y, si corresponde, <b>tags</b> (lo que hizo bien o debe trabajar), <b>error de reglas</b> o <b>jugada especial</b> (solo jugadas de impacto en el juego).</li>
+<li><b>IRS / Challenge:</b> uso correcto o incorrecto, decisión final (correcta, incorrecta o sin decisión si la imagen no lo permitió), qué árbitros fueron y, en el Challenge, si fue <b>ganado, perdido o video no claro</b>.</li>
+<li>Tocá <b>Registrar jugada</b>. Aparece en la lista de la derecha.</li></ul></div>
+<div class="card"><h3>3. Corregir, retomar o reabrir</h3><ul>
+<li><b>Editar una jugada:</b> tocala en la lista, cambiá lo que haga falta y tocá <b>Actualizar jugada</b>. Para eliminarla, <b>Borrar</b>.</li>
+<li><b>Salir y volver:</b> todo queda guardado en el dispositivo. Desde el inicio, <b>Jugada a jugada</b> te devuelve al juego en curso.</li>
+<li><b>Después de cerrar:</b> en el inicio, <b>Ver o corregir jugadas</b> permite corregir. Si corregís, volvé a compartir la evaluación.</li>
+<li><b>Retomar en otro dispositivo:</b> descargá la evaluación (.txt) y, en el otro, usá <b>Retomar (.txt)</b>.</li>
+<li><b>Otro partido:</b> <b>Nueva evaluación</b> borra la actual de este dispositivo; mandala antes.</li></ul></div>
+<div class="card"><h3>4. Terminar y enviar al departamento</h3><ul>
+<li>Al final tocá <b>Terminar juego</b> y elegí la dificultad: Fácil, Normal o Difícil.</li>
+<li>Tocá <b>Compartir evaluación</b> y enviala por correo a <span class="mail mt"></span>. En iPad o teléfono se abre el menú Compartir con el archivo .txt adjunto; en computadora se descarga el .txt y se abre un correo nuevo para adjuntarlo.</li>
+<li>Si preferís mandarla más tarde, tocá <b>Descargar evaluación</b> y adjuntá el archivo desde tu correo.</li>
+<li>Cuando la mandes, tocá <b>Ya la envié</b>. Mientras tanto el inicio muestra <i>Evaluación sin enviar</i>.</li></ul></div>
+<div class="card"><h3>5. Cómo se puntúa (resumen)</h3><p>Escala de 1 a 5 con dos decimales; 3 es el estándar. Cada decisión correcta suma 4 y cada incorrecta 2; los tags suben o bajan su área; la dificultad ajusta ±0,30. Hay causas automáticas que dejan el partido debajo del estándar, por ejemplo 10 decisiones incorrectas o un IRS mal resuelto. En <b>Evaluación</b> podés ver cómo se llega a cada puntaje. El detalle está en <a href="scoring-rules.html">Reglas de puntaje</a>.</p></div>
+<div class="card"><h3>Seguridad de los datos</h3><p>Los datos se guardan solo en tu dispositivo; no hay servidor. Enviá cada evaluación al terminar el partido.</p></div>
+</div>
 
-<div class="card" style="border-color:var(--y)"><h3 style="color:var(--y)">Qué es obligatorio registrar</h3><p>Para la validez del informe y la consistencia de los datos es <b>OBLIGATORIO</b> registrar: <b>todas las revisiones IRS y Challenge, todas las faltas descalificantes, flagrantes, disruptivas y técnicas</b>. Para el resto de las incidencias queda a tu criterio qué jugadas son relevantes para ingresar.</p></div>
-<div class="card"><h3>2. Registrar jugadas</h3><p>En <b>Jugada a jugada</b> completá en cada jugada las secciones resaltadas.</p>
-<ul><li><b>Resultado del cobro:</b> COBRO CORRECTO · COBRO INCORRECTO (se cobró algo que no correspondía) · NO COBRO INCORRECTO (había que cobrar y no se cobró) · NO COBRO CORRECTO (no había nada que cobrar). En la lista de jugadas se abrevian CC, CI, NCI y NCC.</li>
-<li><b>Tiempo de juego:</b> elegí el período (1C, 2C, 3C, 4C o TE) y escribí tres números (943 queda 09:43) o usá + y −. El tiempo crucial se marca solo: los últimos 2:00 del 4.º cuarto y todo el tiempo extra.</li>
-<li><b>Posición y árbitro:</b> tocá la posición (Líder, Central o Seguidor) y el árbitro que decidió. Si la decisión involucra a más de un árbitro, activá <b>Varios</b> (el ícono de las personas): tocá un árbitro para sumarlo y después su posición; repetí con el siguiente. Tocá de nuevo el árbitro resaltado para quitarlo. La jugada cuenta en la evaluación de cada árbitro marcado.</li>
-<li><b>Tipo de incidente:</b> elegí una falta, violación u otro incidente, o escribí otro en el campo libre.</li>
-<li><b>IRS / Challenge:</b> tocá IRS o Challenge y marcá el uso (correcto o incorrecto), la decisión final luego de mirar la imagen (correcta, incorrecta o <i>sin decisión</i> si la imagen no permitió ver la acción) y qué árbitros fueron a la revisión. En el Challenge marcá además el resultado: <b>ganado</b>, <b>perdido</b> o <b>video no claro</b>. La calificación cuenta para los que fueron.</li>
-<li><b>Ubicación en cancha:</b> tocá la zona de media cancha donde ocurrió la jugada, o <b>Campo trasero</b>.</li>
-<li><b>Tags:</b> señalan qué debe trabajar o qué hizo bien el árbitro. Cada tag necesita una calificación y solo se habilitan las que corresponden. <b>Ventaja/Desventaja</b> (− o +) califica el criterio con que se aplicó la ventaja/desventaja y suma a Selección de cobros.</li>
-<li><b>Error de reglas:</b> calificá el impacto (Malo / Muy malo) para cada árbitro y agregá un comentario.</li>
-<li><b>Jugada especial:</b> solo para jugadas de impacto en el juego. Al marcarla aparece un aviso para confirmar: sus puntos pesan un 20% más, para bien o para mal.</li></ul></div>
-
-<div class="card"><h3>3. Terminar el partido y enviar la evaluación</h3><p>Al tocar <b>Terminar juego</b> elegí la dificultad del partido (Fácil, Normal o Difícil). Después aparece la pantalla de envío: tocá <b>Compartir evaluación</b> y mandala por correo a <span class="mail" id="mt"></span>. Si preferís mandarla más tarde, tocá <b>Descargar evaluación</b> y adjuntá el archivo desde tu correo.</p>
-<ul><li>En iPad, iPhone o Android se abre el menú Compartir con el archivo adjunto: elegí Mail y enviá.</li><li>En computadora se descarga el archivo y se abre un correo nuevo a esa dirección: adjuntá el archivo descargado.</li></ul>
-<p>Cuando la mandes, tocá <b>Ya la envié</b>. Mientras tanto, el inicio muestra el aviso <i>Evaluación sin enviar</i>. Después del cierre todavía podés corregir jugadas; si corregís algo, volvé a compartirla. Para evaluar otro partido usá <b>Nueva evaluación</b>.</p></div>
-
-<div class="card"><h3>4. Ver la evaluación del partido</h3><p><b>Evaluación</b> muestra, para cada árbitro de la terna, el puntaje global con dos decimales y, si queda debajo del estándar, la causa. <b>Cómo se llega al puntaje</b> muestra cada área con lo que la compone (por ejemplo “1× COBRO CORRECTO 4,00 · 1× COBRO INCORRECTO 2,00 · Dificultad +0,30”) y la cuenta del global; las pestañas <b>Restó</b> y <b>Sumó</b> listan lo que bajó o subió el puntaje. También están las decisiones por cuarto, el cuadro de incorrectas por posición y cuarto, los errores por tipo de incidente, por posición y por zona de cancha. Con <b>Ver: Faltas / Violaciones / Otros</b> y el tipo de incidente se filtran todas las vistas a la vez; así se ve, por ejemplo, si un árbitro erra más faltas como Líder a medida que avanza el partido. Tocá cualquier número, barra o zona para ver sus jugadas. <b>Informe del partido</b> descarga el detalle completo de los tres árbitros. El cálculo está explicado en <b>Reglas de puntaje</b>.</p></div>
-
-<div class="card"><h3>5. Consolidado (departamento arbitral)</h3><p>En la pantalla de inicio, pasá a <b>Consolidado (departamento)</b> y tocá <b>Cargar evaluaciones</b>: se pueden elegir todos los archivos recibidos juntos, por ejemplo 200. Los partidos repetidos se cargan una sola vez (un partido se identifica por fecha, competencia y equipos). Estadísticas y Evaluación muestran todos los partidos juntos, con filtros por categoría, competencia y evaluador; en Evaluación cada árbitro tiene su promedio y la lista de sus partidos. El consolidado se guarda aparte de “Mi evaluación”.</p><p><b>Seguimiento de desempeño</b> (experimental) muestra la evolución por mes o semana de un árbitro o de todos sumados, filtrando por torneo y tipo de incidente: correctas e incorrectas, resultado del cobro, puntaje promedio, IRS / Challenge y los 5 errores más repetidos. Con todos los árbitros, una jugada que involucra a varios se cuenta una sola vez. Al elegir <b>un árbitro</b> se abre su ficha: progresión partido a partido, áreas por partido, errores por tipo en cada partido, cómo le va como Líder, Central y Seguidor, rendimiento según la dificultad, tags que se repiten, comparación con su categoría y un resumen “Para trabajar”. <b>Cargar datos de ejemplo</b> trae 50 partidos ficticios de la LUB para probarlo.</p></div>
-
-<div class="card"><h3>6. Seguridad de los datos</h3><p>Los datos se guardan solo en este dispositivo; no hay servidor. Enviá cada evaluación al terminar el partido. En el departamento, descargá un respaldo del consolidado después de cada carga grande.</p></div>
+<!-- ================= DEPARTAMENTO ================= -->
+<div id="dp">
+<div class="card"><h3>Video: consolidado, estadísticas, seguimiento y criterio de evaluación</h3><div id="vid-dp"></div><div class="vid-note">Unos 8 minutos. El video usa datos de demostración con nombres ficticios.</div></div>
+<div class="card"><div class="toc"><a href="#d1">Cargar evaluaciones</a><a href="#d2">Estadísticas</a><a href="#d3">Evaluación por árbitro</a><a href="#d4">Seguimiento colectivo</a><a href="#d5">Ficha individual</a><a href="#d6">Criterio de evaluación</a><a href="#d7">Buenas prácticas</a></div></div>
+<div class="card key"><h3>Por qué importa cuántas jugadas carga el evaluador</h3><p>No se cargan todas las jugadas de un partido, así que la herramienta no calcula efectividad en porcentajes: cuenta decisiones y errores. Cuantas más jugadas carguen los evaluadores (correctas e incorrectas), más confiables son los puntajes, las tendencias y las comparaciones entre árbitros. Lo obligatorio (revisiones y faltas descalificantes, flagrantes, disruptivas y técnicas) es comparable siempre; el resto depende del criterio de cada evaluador.</p></div>
+<div class="card" id="d1"><h3>1. Cargar todas las evaluaciones</h3><ul>
+<li>En el inicio pasá a <b>Consolidado (departamento)</b> y tocá <b>Cargar evaluaciones (.txt)</b>.</li>
+<li>Seleccioná todos los archivos recibidos de una vez (cientos si hace falta). Un partido se identifica por <b>fecha, torneo y equipos</b>: si llega dos veces, se carga una sola.</li>
+<li>Podés cargar más archivos después; se suman a los anteriores.</li>
+<li>Descargá un <b>Respaldo</b> después de cada carga grande y guardalo; con <b>Cargar respaldo</b> se recupera todo.</li>
+<li><b>Cargar datos de ejemplo</b> trae 50 partidos ficticios para practicar; al cargar evaluaciones reales se borran.</li></ul></div>
+<div class="card" id="d2"><h3>2. Estadísticas: los puntos flojos</h3><ul>
+<li><b>Estadísticas</b> resume todos los partidos con filtros por categoría, torneo, evaluador y árbitro.</li>
+<li>Muestra qué <b>tipos de incidente</b> aparecen más y en cuáles hay más errores, por cuarto, por posición y por zona de la cancha.</li>
+<li>Tocá cualquier número para ver las jugadas que lo forman, con su comentario.</li></ul></div>
+<div class="card" id="d3"><h3>3. Evaluación por árbitro</h3><ul>
+<li><b>Evaluación</b> muestra cada árbitro con su promedio y la lista de sus partidos (pestaña <b>Por partido</b>).</li>
+<li><b>Cómo se llega al puntaje</b> desarma cada área: decisiones, tags, revisiones, dificultad y topes. <b>Restó</b> y <b>Sumó</b> listan lo que bajó o subió el puntaje.</li>
+<li>Si el promedio queda debajo del estándar, se ve la causa con el partido y la jugada.</li>
+<li><b>Informe</b> descarga el detalle del árbitro para la devolución.</li></ul></div>
+<div class="card" id="d4"><h3>4. Seguimiento de desempeño: todos los árbitros</h3><ul>
+<li>Con <b>Todos los árbitros</b>, cada jugada se cuenta una sola vez aunque involucre a varios árbitros.</li>
+<li>Correctas e incorrectas por mes o semana, resultado del cobro y puntaje promedio. Filtrá por torneo y tipo de incidente.</li>
+<li><b>Qué se revisa en IRS / Challenge:</b> qué tipos de jugada piden más los entrenadores, cuántos Challenge ganan, pierden o quedan con video no claro, y cuántas decisiones en el monitor fueron correctas o incorrectas.</li>
+<li><b>Posiciones y zonas:</b> desde qué posición y en qué zonas el grupo se equivoca más.</li>
+<li><b>Los 5 errores más repetidos</b> de todos los árbitros: los temas para las próximas capacitaciones.</li></ul></div>
+<div class="card" id="d5"><h3>5. Ficha individual del árbitro</h3><ul>
+<li>Elegí un árbitro en <b>Seguimiento de desempeño</b>.</li>
+<li><b>Progresión partido a partido</b> (P1, P2…), con la línea verde del promedio de su categoría.</li>
+<li><b>Áreas partido a partido</b> y <b>errores por tipo en cada partido</b>, comparando primera y segunda mitad de sus partidos.</li>
+<li>Cómo le va como <b>Líder, Central y Seguidor</b> y en qué zonas se equivoca. Compará con <i>Posiciones y zonas</i> de todos los árbitros: si el grupo también falla ahí, es un tema colectivo; si no, es individual.</li>
+<li><b>Rendimiento según la dificultad</b>, <b>tags que se repiten</b>, comparación con su categoría y el resumen <b>Para trabajar</b>.</li></ul></div>
+<div class="card" id="d6"><h3>6. Criterio de evaluación (detalle)</h3><ul>
+<li><b>Escala:</b> de 1 a 5 con dos decimales. 3,00 es el estándar. Niveles: 4,50 o más rendimiento superior; 3,75 a 4,49 por encima del estándar; 2,80 a 3,74 en el estándar; 2,00 a 2,79 por debajo del estándar; menos de 2,00 no aceptable.</li>
+<li><b>Cinco áreas:</b> Selección de cobros; Disciplina en mecánica y posicionamiento; Manejo del partido y control de conducta; Señales, lenguaje corporal y comunicación; Trabajo en equipo / Control emocional. El global del partido es el promedio de las cinco.</li>
+<li><b>Puntos por jugada:</b> decisión correcta 4,00; incorrecta 2,00; incorrecta con tag muy negativo (llamada fantasma o cruzada) 1,50. Tags: muy negativo 1,50, negativo 2,00, positivo 4,00, muy positivo 4,50. IRS / Challenge: uso correcto 4, incorrecto 2; decisión final correcta 4, incorrecta 2; sin decisión no suma.</li>
+<li><b>Promedio del área:</b> el promedio de sus puntos. Un área sin registros cuenta como 3,00.</li>
+<li><b>Jugada especial:</b> amplifica un 20% la distancia al 3 (para bien o para mal).</li>
+<li><b>Dificultad:</b> Fácil −0,30, Normal 0, Difícil +0,30 en las áreas con registros.</li>
+<li><b>Causas automáticas:</b> 10 o más incorrectas; no cobrar una flagrante; llamada fantasma en tiempo crucial; IRS / Challenge con uso incorrecto o decisión final incorrecta (para los que fueron); error de reglas Muy malo, o Malo con tags negativos → el partido queda como máximo en 2,79. No cobrar una flagrante en tiempo crucial o una descalificante → como máximo 1,99. Los tags por sí solos nunca son causa automática.</li>
+<li><b>Tope por área baja:</b> si un área queda debajo de 2,80, el global no puede pasar de 3,74.</li>
+<li><b>Consolidado:</b> el puntaje de un árbitro es el promedio de los globales de sus partidos.</li>
+<li>Todo esto, con ejemplos calculados, está en <a href="scoring-rules.html">Reglas de puntaje</a>.</li></ul></div>
+<div class="card" id="d7"><h3>7. Buenas prácticas</h3><ul>
+<li>Pedí a los evaluadores que manden cada evaluación al terminar el partido a <span class="mail mt"></span>.</li>
+<li>Cargá las evaluaciones con frecuencia y hacé un respaldo después de cada carga.</li>
+<li>Usá los datos como guía para la devolución y las capacitaciones, siempre junto con el video de las jugadas.</li>
+<li>Los datos se guardan solo en este dispositivo; no hay servidor.</li></ul></div>
+</div>
 </div>
 <script src="panel-buttons.js"></script><script src="scoring-criteria.js"></script><script src="store.js"></script><script>try{localStorage.setItem('fubb5x5_instrucciones','1')}catch(e){}
-document.getElementById('h').innerHTML=hdr('Instrucciones',hdrInfo(Store.get()),1);document.getElementById('mt').textContent=sendTo();
-const U=(window.CONFIG||{}).tutorialUrl||'',m=U.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
-document.getElementById('vid').innerHTML=m?`<div class="vw"><iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" title="Cómo evaluar un partido" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div><p><a href="${esc(U)}" target="_blank" rel="noopener">Abrir el video en YouTube</a></p>`
-:`<div class="vph">${IC.play}<span>El video de instrucciones estará disponible pronto.</span></div>`;
+document.getElementById('h').innerHTML=hdr('Instrucciones',hdrInfo(Store.get()),1);document.querySelectorAll('.mt').forEach(e=>e.textContent=sendTo());
+function vid(id,url,file,title){const m=(url||'').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+ document.getElementById(id).innerHTML=m?`<div class="vw"><iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" title="${title}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+ :`<div class="vw"><video controls preload="metadata" playsinline poster="videos/${file}.jpg" src="videos/${file}.mp4" title="${title}"></video></div>`}
+const CF=window.CONFIG||{};vid('vid-ev',CF.tutorialUrlEvaluador,'evaluador','Instrucciones para el evaluador');vid('vid-dp',CF.tutorialUrlDepartamento,'departamento','Instrucciones para el departamento arbitral');
+function tab(t){['ev','dp'].forEach(k=>{document.getElementById(k).style.display=k==t?'block':'none';document.getElementById('b-'+k).classList.toggle('on',k==t)});document.querySelectorAll('video').forEach(v=>v.pause());try{localStorage.setItem('fubb5x5_instr_tab',t)}catch(e){}history.replaceState(null,'','#'+(t=='ev'?'evaluador':'departamento'))}
+let t0=({evaluador:'ev',departamento:'dp'})[location.hash.slice(1)]||'';if(!['ev','dp'].includes(t0)){try{t0=localStorage.getItem('fubb5x5_instr_tab')||''}catch(e){}if(!['ev','dp'].includes(t0))t0=Store.mode=='cons'?'dp':'ev'}tab(t0);
 </script></body></html>

@@ -4,8 +4,10 @@
    con una key nueva (sin tildes ni espacios, en camelCase). */
 // Configuración general
 window.CONFIG = {
-  sendTo: 'evaluaciones@deptoarbitral.com',  // correo al que se envía cada evaluación terminada
-  tutorialUrl: ''                             // enlace de YouTube del video de instrucciones (ej.: 'https://www.youtube.com/watch?v=XXXXXXXXXXX')
+  sendTo: 'departamentoarbitral@fubb.org.uy',  // correo al que se envía cada evaluación terminada
+  // Videos de instrucciones: vienen incluidos en la carpeta videos/. Si los subís a YouTube, pegá el enlace acá y se usa ese.
+  tutorialUrlEvaluador: '',        // ej.: 'https://www.youtube.com/watch?v=XXXXXXXXXXX'
+  tutorialUrlDepartamento: ''
 };
 (function () {
   const mk = (id, title, items, extra) => ({ id, title, ...extra, buttons: items.map(([label, key]) => ({ label, key })) });

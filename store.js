@@ -1,4 +1,4 @@
-const APP_VERSION=8;   // sumar 1 en cada versión entregada (también en sw.js)
+const APP_VERSION=9;   // sumar 1 en cada versión entregada (también en sw.js)
 /* Hay dos conjuntos de datos en el navegador:
    - "Mi evaluación": el juego que evalúa el evaluador (un juego por evaluación).
    - "Consolidado": lo que carga el departamento arbitral uniendo los .txt de muchos evaluadores.
